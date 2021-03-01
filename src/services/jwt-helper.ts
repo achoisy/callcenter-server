@@ -1,6 +1,7 @@
+import { env } from '../env-handler';
 import jwt from 'jsonwebtoken';
 
-const secretKey = process.env.JWT_KEY || 'asdfhfrHHfuidj'; // add for test purpose
+const secretKey = env.JWT_KEY; // add for test purpose
 
 export class JWT {
   static sign(payload: object): string {

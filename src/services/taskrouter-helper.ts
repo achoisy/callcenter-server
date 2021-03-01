@@ -1,11 +1,9 @@
+import { env } from '../env-handler';
 import twilio from 'twilio';
 import { TaskrouterAttriutes, TwilioSetup } from '../interfaces';
 
 export class Taskrouter {
-  private client = twilio(
-    process.env.TWILIO_ACCOUNT_SID,
-    process.env.TWILIO_AUTH_TOKEN
-  );
+  private client = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
 
   constructor(private configuration: TwilioSetup) {}
 
@@ -19,7 +17,7 @@ export class Taskrouter {
     };
 
     return this.client.taskrouter
-      .workspaces(process.env.TWILIO_WORKSPACE_SID!)
+      .workspaces(env.TWILIO_WORKSPACE_SID!)
       .tasks.create(payload);
   }
 }
