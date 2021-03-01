@@ -1,4 +1,4 @@
-import { loadEnv } from './env-handler';
+import { loadEnv, env } from './env-handler';
 import mongoose from 'mongoose';
 
 // Loading env variables
@@ -19,8 +19,22 @@ const start = async () => {
     console.log(error);
   }
 
-  app.listen(3000, () => {
-    console.log('Listening on port 3000');
+  app.listen(env.HTTP_PORT, () => {
+    console.log(`Listening on port ${env.HTTP_PORT}`);
+  });
+
+  // Gracefull shutdown function
+  const stop = async () => {
+    console.log('Trying graceful shutdown!');
+    await mongoose.disconnect();
+    setTimeout(process.exit(0), 2000);
+  };
+
+  process.on('SIGINT', () => {
+    stop();
+  });
+  process.on('SIGTERM', () => {
+    stop();
   });
 };
 

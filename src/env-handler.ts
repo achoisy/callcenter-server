@@ -1,8 +1,12 @@
 import { EnvType, load } from 'ts-dotenv';
-
+// TODO: convert to class
 export type Env = EnvType<typeof schema>;
 
 export const schema = {
+  // Ports
+  HTTP_PORT: Number,
+  HTTPS_PORT: Number,
+
   // TWILIO Secrets
   TWILIO_ACCOUNT_SID: String,
   TWILIO_AUTH_TOKEN: String,
