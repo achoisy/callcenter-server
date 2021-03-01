@@ -1,0 +1,65 @@
+import mongoose from 'mongoose';
+import { Password } from '../services/password';
+
+// An interface that describe proproties neded to create a new user
+interface UserAttrs {
+  email: string;
+  password: string;
+  admin?: boolean;
+}
+
+// Interface that describe propoties a user model have
+interface UserModel extends mongoose.Model<UserDoc> {
+  build(attrs: UserAttrs): UserDoc;
+}
+
+// An interface that describe the propreties that a user have
+interface UserDoc extends mongoose.Document {
+  email: string;
+  password: string;
+  admin: boolean;
+}
+
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    admin: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.password;
+      },
+      versionKey: false,
+    },
+  }
+);
+
+userSchema.pre('save', async function (done) {
+  if (this.isModified('password')) {
+    const hashed = await Password.toHash(this.get('password'));
+    this.set('password', hashed);
+  }
+  done();
+});
+
+// Only for typescript to work properly
+userSchema.statics.build = (attrs: UserAttrs) => {
+  return new User(attrs);
+};
+
+const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
+
+export { User };
