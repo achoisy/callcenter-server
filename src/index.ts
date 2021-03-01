@@ -8,6 +8,7 @@ import { NotFoundError } from './errors/';
 import mongoose from 'mongoose';
 
 // Check for env before starting service
+require('dotenv').config();
 import './env-check';
 
 const app = express();
