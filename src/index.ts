@@ -1,10 +1,14 @@
 import { loadEnv } from './env-handler';
 import mongoose from 'mongoose';
+
+// Loading env variables
+// Load before importing app
+loadEnv();
+
 import { app } from './app';
 
 const start = async () => {
   try {
-    loadEnv();
     await mongoose.connect('mongodb://localhost:27017/callcenter', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
