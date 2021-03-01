@@ -24,7 +24,7 @@ app.use('/auth', authRouter);
 // Configuration middleware
 app.use(configuration);
 
-app.use('ivr', ivrRouter);
+app.use('/ivr', ivrRouter);
 
 // Not Found route
 app.all('*', async (req, res) => {

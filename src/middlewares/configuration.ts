@@ -26,6 +26,18 @@ export const configuration = async (
       );
     }
     req.configuration = configuration;
+
+    if (req.path.includes('/ivr')) {
+      res.set({
+        'Content-Type': 'application/xml',
+        'Cache-Control': 'public, max-age=0',
+      });
+    } else {
+      res.set({
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=0',
+      });
+    }
   } catch (error) {}
 
   next();
