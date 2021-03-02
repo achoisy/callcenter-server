@@ -1,5 +1,6 @@
 import express from 'express';
 import morgan from 'morgan';
+import bodyParser from 'body-parser';
 import 'express-async-errors';
 import cookieSession from 'cookie-session';
 import { json } from 'body-parser';
@@ -8,15 +9,23 @@ import { errorHandler, currentUser, configuration } from './middlewares/';
 import { NotFoundError } from './errors/';
 
 const app = express();
-app.use(morgan('combined'));
-app.set('trust proxy', true);
-app.use(json());
+//app.use(json());
 app.use(
   cookieSession({
     signed: false,
     // secure: process.env.NODE_ENV !== 'test',
   })
 );
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json({}));
+
+app.set('trust proxy', true);
+
+app.use(morgan('combined'));
 
 // Add id and email of current user if any to req.currentUser
 app.use(currentUser);
