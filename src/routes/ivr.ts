@@ -6,10 +6,10 @@ import { TaskrouterAttriutes, Channel } from '../interfaces';
 import { Taskrouter } from '../services/taskrouter-helper';
 
 const router = express.Router();
-const twimlVoice = new twiml.VoiceResponse();
 
 const IvrChoiceError = (req: Request, res: Response) => {
   // User did not make any choice, redirect to ivr welcome message again.
+  const twimlVoice = new twiml.VoiceResponse();
   twimlVoice.say('Vous avez fait un choix non valide !');
   twimlVoice.pause({ length: 2 });
   twimlVoice.redirect({ method: 'GET' }, 'welcome');
@@ -18,6 +18,7 @@ const IvrChoiceError = (req: Request, res: Response) => {
 };
 
 const IvrRequestError = (error: string, res: Response) => {
+  const twimlVoice = new twiml.VoiceResponse();
   console.error(`Ivr Request Error: ${error}`);
   // Error on query object
   twimlVoice.say(
@@ -30,6 +31,8 @@ const IvrRequestError = (error: string, res: Response) => {
 router.get(
   '/welcome',
   async (req, res, next) => {
+    console.log('/welcome');
+    const twimlVoice = new twiml.VoiceResponse();
     const gather = twimlVoice.gather({
       input: ['dtmf'],
       action: 'select-service',
@@ -37,7 +40,6 @@ router.get(
       numDigits: 1,
       timeout: 4,
     });
-
     // Play welcome message
     gather.say(req.configuration.ivr.text);
 
@@ -52,6 +54,8 @@ router.get(
   query('Digits').notEmpty(),
   validateRequest,
   (req: Request, res: Response, next: NextFunction) => {
+    console.log('/select-service');
+    const twimlVoice = new twiml.VoiceResponse();
     if (typeof req.query.Digits !== 'string') {
       return IvrRequestError(
         `Digits not of type string: ${req.query.Digits}`,
@@ -76,7 +80,6 @@ router.get(
       numDigits: 1,
       timeout: 5,
     });
-
     gather.say(
       `Appuyer sur une touche pour etre rappelé par le service 
       ${service.friendlyName}, ou patientez sur la ligne.`
@@ -108,6 +111,8 @@ router.get(
 );
 
 router.get('/create-task', async (req, res) => {
+  console.log('create-task');
+  const twimlVoice = new twiml.VoiceResponse();
   if (typeof req.query.From !== 'string') {
     return IvrRequestError(`From not of type string: ${req.query.From}`, res);
   }
