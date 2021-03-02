@@ -80,12 +80,12 @@ router.post(
     await user.save();
 
     // Store jwt token in cookie
-    req.session = {
+    /* req.session = {
       jwt: JWT.sign({
         id: user.id,
         email: user.email,
       }),
-    };
+    }; */
 
     res.status(201).send(user);
   }
