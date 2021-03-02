@@ -9,7 +9,7 @@ import { NotFoundError } from './errors/';
 
 const app = express();
 app.use(morgan('combined'));
-// app.set('trust proxy', true)
+app.set('trust proxy', true);
 app.use(json());
 app.use(
   cookieSession({
