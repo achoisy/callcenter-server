@@ -9,7 +9,9 @@ import { errorHandler, currentUser, configuration } from './middlewares/';
 import { NotFoundError } from './errors/';
 
 const app = express();
-//app.use(json());
+app.use(morgan('combined'));
+app.set('trust proxy', true);
+app.use(json());
 app.use(
   cookieSession({
     signed: false,
@@ -18,14 +20,10 @@ app.use(
 );
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+//app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
-app.use(bodyParser.json({}));
-
-app.set('trust proxy', true);
-
-app.use(morgan('combined'));
+//app.use(bodyParser.json({}));
 
 // Add id and email of current user if any to req.currentUser
 app.use(currentUser);

@@ -7,60 +7,44 @@ import { Taskrouter } from '../services/taskrouter-helper';
 
 const router = express.Router();
 
-const IvrChoiceError = (req: Request, res: Response) => {
-  // User did not make any choice, redirect to ivr welcome message again.
+router.get('/welcome', async (req, res) => {
   const twimlVoice = new twiml.VoiceResponse();
-  twimlVoice.say('Vous avez fait un choix non valide !');
+  const gather = twimlVoice.gather({
+    input: ['dtmf'],
+    action: 'select-service',
+    method: 'GET',
+    numDigits: 1,
+    timeout: 4,
+  });
+  // Play welcome message
+  gather.say(req.configuration.ivr.text);
+
+  twimlVoice.say("Vous n'avez pas fait de choix !");
   twimlVoice.pause({ length: 2 });
   twimlVoice.redirect({ method: 'GET' }, 'welcome');
 
   res.status(200).send(twimlVoice.toString());
-};
-
-const IvrRequestError = (error: string, res: Response) => {
-  const twimlVoice = new twiml.VoiceResponse();
-  console.error(`Ivr Request Error: ${error}`);
-  // Error on query object
-  twimlVoice.say(
-    'Une erreur est survenu dans le traitement de votre demande. Veuillez nous recontacter ulterieurement. Merci.'
-  );
-  twimlVoice.hangup();
-  return res.status(200).send(twiml.toString());
-};
-
-router.get(
-  '/welcome',
-  async (req, res, next) => {
-    console.log('/welcome');
-    const twimlVoice = new twiml.VoiceResponse();
-    const gather = twimlVoice.gather({
-      input: ['dtmf'],
-      action: 'select-service',
-      method: 'GET',
-      numDigits: 1,
-      timeout: 4,
-    });
-    // Play welcome message
-    gather.say(req.configuration.ivr.text);
-
-    // User did not make any choice, redirect to ivr welcome message again.
-    next();
-  },
-  IvrChoiceError
-);
+});
 
 router.get(
   '/select-service',
   query('Digits').notEmpty(),
   validateRequest,
-  (req: Request, res: Response, next: NextFunction) => {
-    console.log('/select-service');
+  (req: Request, res: Response) => {
     const twimlVoice = new twiml.VoiceResponse();
-    if (typeof req.query.Digits !== 'string') {
-      return IvrRequestError(
-        `Digits not of type string: ${req.query.Digits}`,
-        res
+
+    const IvrRequestError = (error: string) => {
+      console.error(`Ivr Request Error: ${error}`);
+      // Error on query object
+      twimlVoice.say(
+        'Une erreur est survenu dans le traitement de votre demande. Veuillez nous recontacter ulterieurement. Merci.'
       );
+      twimlVoice.hangup();
+      return res.status(200).send(twiml.toString());
+    };
+
+    if (typeof req.query.Digits !== 'string') {
+      return IvrRequestError(`Digits not of type string: ${req.query.Digits}`);
     }
 
     const digits = parseInt(req.query.Digits);
@@ -70,7 +54,11 @@ router.get(
 
     // User have dailed a wrong service digit
     if (!service) {
-      return next();
+      twimlVoice.say('Vous avez fait un choix non valide !');
+      twimlVoice.pause({ length: 2 });
+      twimlVoice.redirect({ method: 'GET' }, 'welcome');
+
+      return res.status(200).send(twimlVoice.toString());
     }
 
     const gather = twimlVoice.gather({
@@ -86,7 +74,7 @@ router.get(
     );
 
     if (typeof req.query.From !== 'string') {
-      return IvrRequestError(`From not of type string: ${req.query.From}`, res);
+      return IvrRequestError(`From not of type string: ${req.query.From}`);
     }
 
     /* create task attributes */
@@ -106,21 +94,29 @@ router.get(
       .task({ priority: 1, timeout: 3600 }, JSON.stringify(attributes));
 
     res.send(twimlVoice.toString());
-  },
-  IvrChoiceError
+  }
 );
 
 router.get('/create-task', async (req, res) => {
-  console.log('create-task');
   const twimlVoice = new twiml.VoiceResponse();
+
+  const IvrRequestError = (error: string) => {
+    console.error(`Ivr Request Error: ${error}`);
+    // Error on query object
+    twimlVoice.say(
+      'Une erreur est survenu dans le traitement de votre demande. Veuillez nous recontacter ulterieurement. Merci.'
+    );
+    twimlVoice.hangup();
+    return res.status(200).send(twiml.toString());
+  };
+
   if (typeof req.query.From !== 'string') {
-    return IvrRequestError(`From not of type string: ${req.query.From}`, res);
+    return IvrRequestError(`From not of type string: ${req.query.From}`);
   }
 
   if (typeof req.query.serviceId !== 'string') {
     return IvrRequestError(
-      `ServiceId not of type string: ${req.query.serviceId}`,
-      res
+      `ServiceId not of type string: ${req.query.serviceId}`
     );
   }
 
@@ -143,7 +139,7 @@ router.get('/create-task', async (req, res) => {
     twimlVoice.hangup();
     res.status(200).send(twiml.toString());
   } catch (error) {
-    IvrRequestError(`Error in Taskrouter createTask: ${error}`, res);
+    IvrRequestError(`Error in Taskrouter createTask: ${error}`);
   }
 });
 
