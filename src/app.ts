@@ -1,4 +1,5 @@
 import express from 'express';
+import morgan from 'morgan';
 import 'express-async-errors';
 import cookieSession from 'cookie-session';
 import { json } from 'body-parser';
@@ -7,6 +8,7 @@ import { errorHandler, currentUser, configuration } from './middlewares/';
 import { NotFoundError } from './errors/';
 
 const app = express();
+app.use(morgan('combined'));
 // app.set('trust proxy', true)
 app.use(json());
 app.use(
