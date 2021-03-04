@@ -44,6 +44,7 @@ const userSchema = new mongoose.Schema(
     workerSid: {
       type: String,
       unique: true,
+      index: true,
     },
     admin: {
       type: Boolean,
