@@ -3,7 +3,8 @@ import { query } from 'express-validator';
 import { validateRequest } from '../middlewares/';
 import { twiml } from 'twilio';
 import { TaskrouterAttriutes, Channel } from '../interfaces';
-import { Taskrouter } from '../services/taskrouter-helper';
+import { taskrouterWrapper } from '../services/taskrouter-helper';
+import { CustomError } from '../errors';
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.get('/welcome', async (req, res) => {
     timeout: 4,
   });
   // Play welcome message
-  gather.say(req.configuration.ivr.text);
+  gather.say(req.twilio.ivr.text);
 
   twimlVoice.say("Vous n'avez pas fait de choix !");
   twimlVoice.pause({ length: 2 });
@@ -48,7 +49,7 @@ router.get(
     }
 
     const digits = parseInt(req.query.Digits);
-    const service = req.configuration.ivr.options.find(
+    const service = req.twilio.ivr.options.find(
       (option) => option.digit == digits
     );
 
@@ -89,7 +90,7 @@ router.get(
 
     twimlVoice
       .enqueue({
-        workflowSid: req.configuration.twilio.workflowSid,
+        workflowSid: taskrouterWrapper.twilioSetup.workflowSid,
       })
       .task({ priority: 1, timeout: 3600 }, JSON.stringify(attributes));
 
@@ -129,16 +130,17 @@ router.get('/create-task', async (req, res) => {
     phone: req.query.From,
   };
 
-  const taskrouter = new Taskrouter(req.configuration.twilio);
-
   try {
-    await taskrouter.createTask(attributes);
+    await taskrouterWrapper.createTask(attributes);
     twimlVoice.say(
       'Merci pour votre demande de rappel, un agent va vous recontacter rapidement.'
     );
     twimlVoice.hangup();
     res.status(200).send(twiml.toString());
   } catch (error) {
+    if (error instanceof CustomError) {
+      throw error;
+    }
     IvrRequestError(`Error in Taskrouter createTask: ${error}`);
   }
 });

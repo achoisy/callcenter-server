@@ -5,6 +5,16 @@ export enum Channel {
   video = 'video',
 }
 
+export enum Service {
+  default = 'default',
+}
+
+export enum activityName {
+  offline = 'Offline',
+  available = 'Available',
+  unavailable = 'Unavailable',
+}
+
 export interface Ivr {
   text: string;
   options: [{ friendlyName: string; digit: number; id: string }];
@@ -47,4 +57,18 @@ export interface TaskrouterAttriutes {
   phone: string;
   name: string;
   service: string;
+}
+
+export interface WorkersAttributes {
+  name: string;
+  channels: Channel[];
+  service: Service[];
+}
+
+export interface WorkerAttrs {
+  workerSid: string;
+  friendlyName: string;
+  attributes: any;
+  activityName: string;
+  available: boolean;
 }

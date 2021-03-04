@@ -1,11 +1,16 @@
 import express from 'express';
 import morgan from 'morgan';
-import bodyParser from 'body-parser';
+// import bodyParser from 'body-parser';
 import 'express-async-errors';
 import cookieSession from 'cookie-session';
 import { json } from 'body-parser';
-import { authRouter, ivrRouter } from './routes/';
-import { errorHandler, currentUser, configuration } from './middlewares/';
+import { authRouter, ivrRouter, workersRouter } from './routes/';
+import {
+  errorHandler,
+  currentUser,
+  configuration,
+  requireAdmin,
+} from './middlewares/';
 import { NotFoundError } from './errors/';
 
 const app = express();
@@ -19,16 +24,13 @@ app.use(
   })
 );
 
-// parse application/x-www-form-urlencoded
-//app.use(bodyParser.urlencoded({ extended: false }));
-
-// parse application/json
-//app.use(bodyParser.json({}));
-
 // Add id and email of current user if any to req.currentUser
 app.use(currentUser);
 
 app.use('/auth', authRouter);
+
+// app.use('/workers', requireAdmin, workersRouter);
+app.use('/workers', workersRouter);
 
 // Configuration middleware
 app.use(configuration);

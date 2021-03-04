@@ -1,11 +1,15 @@
 import mongoose from 'mongoose';
 import { Password } from '../services/password';
+import { Channel, Service } from '../interfaces';
 
 // An interface that describe proproties neded to create a new user
 interface UserAttrs {
   email: string;
   password: string;
+  friendlyName?: string;
   admin?: boolean;
+  attributes?: string;
+  workerSid?: string;
 }
 
 // Interface that describe propoties a user model have
@@ -18,6 +22,9 @@ interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
   admin: boolean;
+  friendlyName?: string;
+  attributes?: string;
+  workerSid?: string;
 }
 
 const userSchema = new mongoose.Schema(
@@ -29,6 +36,14 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+    },
+    friendlyName: {
+      type: String,
+    },
+    attributes: String,
+    workerSid: {
+      type: String,
+      unique: true,
     },
     admin: {
       type: Boolean,

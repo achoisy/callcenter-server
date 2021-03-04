@@ -14,3 +14,18 @@ export class DatabaseConnectionError extends CustomError {
     return [{ message: `Databbase error: ${this.message}` }];
   }
 }
+
+export class TaskRouterError extends CustomError {
+  statusCode = 400;
+
+  constructor(public message: string) {
+    super(message);
+
+    // Only because extending a built in class
+    Object.setPrototypeOf(this, TaskRouterError.prototype);
+  }
+
+  serializeErrors() {
+    return [{ message: `Twilio taskRouter error: ${this.message}` }];
+  }
+}

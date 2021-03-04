@@ -1,6 +1,10 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { BadRequestError } from '../errors/';
+import {
+  BadRequestError,
+  CustomError,
+  DatabaseConnectionError,
+} from '../errors/';
 import { validateRequest, requireAdmin } from '../middlewares/';
 import { JWT } from '../services/jwt-helper';
 import { User } from '../models/user';
@@ -69,25 +73,26 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
+    try {
+      const existingUser = await User.findOne({ email });
 
-    const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        throw new BadRequestError('Email in use');
+      }
 
-    if (existingUser) {
-      throw new BadRequestError('Email in use');
+      const user = User.build({
+        email,
+        password,
+      });
+      await user.save();
+
+      res.status(201).send(user);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new DatabaseConnectionError('Could not add new user');
     }
-
-    const user = User.build({ email, password });
-    await user.save();
-
-    // Store jwt token in cookie
-    /* req.session = {
-      jwt: JWT.sign({
-        id: user.id,
-        email: user.email,
-      }),
-    }; */
-
-    res.status(201).send(user);
   }
 );
 

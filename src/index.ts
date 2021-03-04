@@ -1,11 +1,13 @@
 import { loadEnv, env } from './env-handler';
 import mongoose from 'mongoose';
+import { Config } from './models/config';
 
 // Loading env variables
 // Load before importing app
 loadEnv();
 
 import { app } from './app';
+import { taskrouterWrapper } from './services/taskrouter-helper';
 
 const start = async () => {
   try {
@@ -15,6 +17,16 @@ const start = async () => {
       useCreateIndex: true,
     });
     console.log('Conected to mongodb !');
+
+    // Setting up twilio config ----
+    const config = await Config.findOne({ default: true });
+
+    if (!config?.twilio) {
+      throw new Error("Can't get configuration setup from database");
+    }
+
+    taskrouterWrapper.config(config.twilio);
+    //-------------------------------
   } catch (error) {
     console.log(error);
   }

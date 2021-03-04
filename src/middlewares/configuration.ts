@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { TwilioConfiguration } from '../interfaces';
+import { Ivr } from '../interfaces';
 import { Config } from '../models/config';
 import { DatabaseConnectionError } from '../errors/';
 
@@ -7,7 +7,9 @@ import { DatabaseConnectionError } from '../errors/';
 declare global {
   namespace Express {
     interface Request {
-      configuration: TwilioConfiguration;
+      twilio: {
+        ivr: Ivr;
+      };
     }
   }
 }
@@ -20,12 +22,13 @@ export const configuration = async (
   try {
     const configuration = await Config.findOne({ default: true });
 
-    if (!configuration) {
+    if (!configuration?.ivr) {
       throw new DatabaseConnectionError(
         "Can't get configuration setup from database"
       );
     }
-    req.configuration = configuration;
+
+    req.twilio.ivr = configuration.ivr;
 
     if (req.path.includes('/ivr')) {
       res.set({
