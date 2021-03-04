@@ -29,8 +29,8 @@ app.use(currentUser);
 
 app.use('/auth', authRouter);
 
-// app.use('/workers', requireAdmin, workersRouter);
-app.use('/workers', workersRouter);
+app.use('/workers', requireAdmin, workersRouter);
+// app.use('/workers', workersRouter);
 
 // Configuration middleware
 app.use(configuration);
