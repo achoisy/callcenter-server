@@ -9,7 +9,7 @@ import {
   errorHandler,
   currentUser,
   configuration,
-  requireAdmin,
+  requireAuth,
 } from './middlewares/';
 import { NotFoundError } from './errors/';
 
@@ -29,7 +29,7 @@ app.use(currentUser);
 
 app.use('/auth', authRouter);
 
-app.use('/workers', requireAdmin, workersRouter);
+app.use('/workers', requireAuth, workersRouter);
 // app.use('/workers', workersRouter);
 
 // Configuration middleware

@@ -72,3 +72,8 @@ export interface WorkerAttrs {
   activityName: string;
   available: boolean;
 }
+
+export interface WorkspacePolicyOptions {
+  resources?: string[];
+  method?: string;
+}

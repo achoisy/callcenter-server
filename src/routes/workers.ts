@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { validateRequest } from '../middlewares/';
+import { validateRequest, requireAdmin } from '../middlewares/';
 import { body } from 'express-validator';
 import { User } from '../models/user';
 import {
@@ -9,6 +9,7 @@ import {
   CustomError,
 } from '../errors/';
 import { taskrouterWrapper } from '../services/taskrouter-helper';
+import { Twilio } from '../services/twilio-helper';
 
 const router = express.Router();
 
@@ -16,6 +17,7 @@ const router = express.Router();
 // If email in database, link it to user
 router.post(
   '/',
+  requireAdmin,
   [
     body('name')
       .trim()
@@ -54,7 +56,7 @@ router.post(
 );
 
 // Get a worker by Id
-router.get('/:workersid', async (req, res) => {
+router.get('/:workersid', requireAdmin, async (req, res) => {
   const worker = await taskrouterWrapper.getWorkerBySid(req.params.workersid);
   if (!worker) {
     throw new TaskRouterError(
@@ -65,7 +67,7 @@ router.get('/:workersid', async (req, res) => {
 });
 
 // Get a worker list
-router.get('/', async (req, res) => {
+router.get('/', requireAdmin, async (req, res) => {
   const workersList = await taskrouterWrapper.getWorkers();
   if (!workersList) {
     throw new TaskRouterError(`workers list not found`);
@@ -76,7 +78,7 @@ router.get('/', async (req, res) => {
 // Update worker
 
 // Delete worker from twilio and database
-router.delete('/:workersid', async (req, res) => {
+router.delete('/:workersid', requireAdmin, async (req, res) => {
   try {
     await taskrouterWrapper.deleteWorker(req.params.workersid);
     const removeWorker = await User.findOne({
@@ -100,6 +102,7 @@ router.delete('/:workersid', async (req, res) => {
 // link worker with existing user in database
 router.post(
   '/link',
+  requireAdmin,
   [
     body('email').isEmail().withMessage('email est requis'),
     body('workerSid').notEmpty().withMessage('workerSid est requis'),
@@ -139,6 +142,43 @@ router.post(
         `Faild to join worker with user: ${error}`
       );
     }
+  }
+);
+
+// Give worker access token and capability token
+router.post(
+  '/login',
+  [
+    body('applicationSid').notEmpty().withMessage('applicationSid est requis'),
+    body('endpointId').notEmpty().withMessage('endpointId est requis'),
+  ],
+  validateRequest,
+  (req: Request, res: Response) => {
+    const { applicationSid, endpointId } = req.body;
+
+    if (
+      !req.currentUser?.worker.workerSid ||
+      !req.currentUser?.worker.friendlyName
+    ) {
+      throw new BadRequestError('WorkerSid or friendlyName not defined');
+    }
+
+    const { workerSid, friendlyName } = req.currentUser.worker;
+
+    if (!req.session) {
+      throw new BadRequestError('Session not found');
+    }
+    // Add tokens to user session
+    req.session.tokens = {
+      access: Twilio.createAccessToken(
+        applicationSid,
+        friendlyName,
+        endpointId
+      ),
+      worker: taskrouterWrapper.createWorkerTokens(workerSid),
+    };
+
+    res.sendStatus(200);
   }
 );
 

@@ -7,6 +7,7 @@ import {
   Channel,
   Service,
   WorkerAttrs,
+  WorkspacePolicyOptions,
 } from '../interfaces';
 import { TaskRouterError, CustomError } from '../errors/';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
@@ -14,6 +15,8 @@ import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
 const twilioClient = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN, {
   accountSid: env.TWILIO_ACCOUNT_SID,
 });
+
+const TaskRouterCapability = twilio.jwt.taskrouter.TaskRouterCapability;
 
 class Taskrouter {
   private _twilioSetup?: TwilioSetup;
@@ -46,6 +49,24 @@ class Taskrouter {
       available: workerAttrs.available,
     };
   }
+
+  // Creating a TaskRouter Worker capability Policy
+  private buildWorkspacePolicy(options: WorkspacePolicyOptions = {}) {
+    const resources = options.resources || [];
+    const urlComponents = [
+      env.TWILIO_TASKROUTER_URL,
+      env.TWILIO_TASKROUTER_VERSION,
+      'Workspaces',
+      env.TWILIO_WORKSPACE_SID,
+    ];
+
+    return new TaskRouterCapability.Policy({
+      url: urlComponents.concat(resources).join('/'),
+      method: options.method || 'GET',
+      allow: true,
+    });
+  }
+
   // Create a new task in twilio taskrouter for specified callcenter
   async createTask(attributes: TaskrouterAttriutes) {
     try {
@@ -130,6 +151,53 @@ class Taskrouter {
         }
       }
     });
+  }
+
+  // Create a worker capability token to give access to client side to the
+  // taskrouter workes related api
+  // https://www.twilio.com/docs/taskrouter/js-sdk/workspace/worker?code-sample=code-creating-a-taskrouter-worker-capability-token
+  createWorkerTokens(workerSid: string) {
+    const workerCapability = new TaskRouterCapability({
+      accountSid: env.TWILIO_ACCOUNT_SID,
+      authToken: env.TWILIO_AUTH_TOKEN,
+      workspaceSid: env.TWILIO_WORKSPACE_SID,
+      channelId: workerSid,
+      ttl: env.TWILIO_WORKER_TOKEN_LIFETIME,
+    });
+
+    // Event Bridge Policies
+    const eventBridgePolicies = twilio.jwt.taskrouter.util.defaultEventBridgePolicies(
+      env.TWILIO_ACCOUNT_SID,
+      workerSid
+    );
+
+    // Worker Policies
+    const workerPolicies = twilio.jwt.taskrouter.util.defaultWorkerPolicies(
+      env.TWILIO_TASKROUTER_VERSION,
+      env.TWILIO_WORKSPACE_SID,
+      workerSid
+    );
+
+    // Workspace Policies
+    const workspacePolicies = [
+      // Workspace fetch Policy
+      this.buildWorkspacePolicy(),
+      // Workspace subresources fetch Policy
+      this.buildWorkspacePolicy({ resources: ['**'] }),
+      // Workspace resources update Policy
+      this.buildWorkspacePolicy({ resources: ['**'], method: 'POST' }),
+    ];
+
+    // Concat policies
+    eventBridgePolicies
+      .concat(workerPolicies)
+      .concat(workspacePolicies)
+      .forEach((policy) => {
+        workerCapability.addPolicy(policy);
+      });
+
+    // Return capability token
+    return workerCapability.toJwt();
   }
 }
 

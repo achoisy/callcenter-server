@@ -1,11 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { JWT } from '../services/jwt-helper';
-
-interface UserPayload {
-  id: string;
-  email: string;
-  admin: boolean;
-}
+import { UserPayload } from '../interfaces';
 
 // Modify @types directly
 declare global {

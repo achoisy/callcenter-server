@@ -52,6 +52,13 @@ router.post(
       jwt: JWT.sign({
         id: existingUser.id,
         email: existingUser.email,
+        worker: {
+          workerSid: existingUser.workerSid || '',
+          friendlyName: existingUser.friendlyName || '',
+          attributes: existingUser.attributes
+            ? JSON.parse(existingUser.attributes)
+            : {},
+        },
         admin: existingUser.admin || false,
       }),
     };

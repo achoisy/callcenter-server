@@ -14,6 +14,10 @@ export const schema = {
   TWILIO_API_KEY_SID: String,
   TWILIO_API_KEY_SECRET: String,
   TWILIO_CHAT_SERVICE_SID: String,
+  TWILIO_USER_TOKEN_LIFETIME: Number,
+  TWILIO_WORKER_TOKEN_LIFETIME: Number,
+  TWILIO_TASKROUTER_URL: String,
+  TWILIO_TASKROUTER_VERSION: String,
 
   //JWT secret key
   JWT_KEY: String,
