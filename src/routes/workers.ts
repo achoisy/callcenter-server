@@ -38,9 +38,11 @@ router.post(
         const existingUser = await User.findOne({ email });
 
         if (existingUser) {
-          existingUser.friendlyName = worker.friendlyName;
-          existingUser.workerSid = worker.sid;
-          existingUser.attributes = worker.attributes;
+          existingUser.worker = {
+            friendlyName: worker.friendlyName,
+            workerSid: worker.sid,
+            attributes: worker.attributes,
+          };
           await existingUser.save();
         }
       }
@@ -85,9 +87,11 @@ router.delete('/:workersid', requireAdmin, async (req, res) => {
       workerSid: req.params.workersid,
     });
     if (removeWorker) {
-      removeWorker.friendlyName = undefined;
-      removeWorker.workerSid = undefined;
-      removeWorker.attributes = undefined;
+      removeWorker.worker = {
+        friendlyName: undefined,
+        workerSid: undefined,
+        attributes: undefined,
+      };
       await removeWorker.save();
     }
     res.status(200).send();
@@ -128,9 +132,11 @@ router.post(
         throw new BadRequestError('Invalid Email');
       }
 
-      user.friendlyName = worker.friendlyName;
-      user.workerSid = worker.workerSid;
-      user.attributes = JSON.stringify(worker.attributes);
+      user.worker = {
+        friendlyName: worker.friendlyName,
+        workerSid: worker.workerSid,
+        attributes: JSON.stringify(worker.attributes),
+      };
       await user.save();
 
       res.status(200).send();

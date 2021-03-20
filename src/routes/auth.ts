@@ -53,10 +53,10 @@ router.post(
         id: existingUser.id,
         email: existingUser.email,
         worker: {
-          workerSid: existingUser.workerSid || '',
-          friendlyName: existingUser.friendlyName || '',
-          attributes: existingUser.attributes
-            ? JSON.parse(existingUser.attributes)
+          workerSid: existingUser.worker?.workerSid || '',
+          friendlyName: existingUser.worker?.friendlyName || '',
+          attributes: existingUser.worker?.attributes
+            ? JSON.parse(existingUser.worker?.attributes)
             : {},
         },
         admin: existingUser.admin || false,

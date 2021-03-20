@@ -6,10 +6,12 @@ import { Channel, Service } from '../interfaces';
 interface UserAttrs {
   email: string;
   password: string;
-  friendlyName?: string;
   admin?: boolean;
-  attributes?: string;
-  workerSid?: string;
+  worker?: {
+    friendlyName?: string;
+    attributes?: string;
+    workerSid?: string;
+  };
 }
 
 // Interface that describe propoties a user model have
@@ -22,9 +24,11 @@ interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
   admin: boolean;
-  friendlyName?: string;
-  attributes?: string;
-  workerSid?: string;
+  worker?: {
+    friendlyName?: string;
+    attributes?: string;
+    workerSid?: string;
+  };
 }
 
 const userSchema = new mongoose.Schema(
@@ -37,14 +41,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    friendlyName: {
-      type: String,
-    },
-    attributes: String,
-    workerSid: {
-      type: String,
-      unique: true,
-      index: true,
+    worker: {
+      friendlyName: {
+        type: String,
+      },
+      attributes: String,
+      workerSid: {
+        type: String,
+        unique: true,
+        index: true,
+      },
     },
     admin: {
       type: Boolean,
