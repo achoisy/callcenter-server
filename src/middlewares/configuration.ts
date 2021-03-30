@@ -8,7 +8,7 @@ declare global {
   namespace Express {
     interface Request {
       twilio?: {
-        ivr?: Ivr;
+        ivr: Ivr;
       };
     }
   }

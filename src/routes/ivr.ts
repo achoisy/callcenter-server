@@ -10,6 +10,17 @@ const router = express.Router();
 
 router.get('/welcome', async (req, res) => {
   const twimlVoice = new twiml.VoiceResponse();
+
+  const IvrRequestError = (error: string) => {
+    console.error(`Ivr Request Error: ${error}`);
+    // Error on query object
+    twimlVoice.say(
+      'Une erreur est survenu dans le traitement de votre demande. Veuillez nous recontacter ulterieurement. Merci.'
+    );
+    twimlVoice.hangup();
+    return res.status(200).send(twiml.toString());
+  };
+
   const gather = twimlVoice.gather({
     input: ['dtmf'],
     action: 'select-service',
@@ -18,6 +29,9 @@ router.get('/welcome', async (req, res) => {
     timeout: 4,
   });
   // Play welcome message
+  if (!req.twilio) {
+    return IvrRequestError('configuration IVR');
+  }
   gather.say(req.twilio.ivr.text);
 
   twimlVoice.say("Vous n'avez pas fait de choix !");
@@ -46,6 +60,10 @@ router.get(
 
     if (typeof req.query.Digits !== 'string') {
       return IvrRequestError(`Digits not of type string: ${req.query.Digits}`);
+    }
+
+    if (!req.twilio) {
+      return IvrRequestError('configuration IVR');
     }
 
     const digits = parseInt(req.query.Digits);
