@@ -17,12 +17,14 @@ export const currentUser = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.session?.jwt) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) {
     return next();
   }
 
   try {
-    const payload = JWT.verify(req.session.jwt) as UserPayload;
+    const payload = JWT.verify(token) as UserPayload;
     const currentUser = await User.findOne({ _id: payload.id });
 
     if (!currentUser) {

@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import cors from 'cors';
 // import bodyParser from 'body-parser';
 import 'express-async-errors';
-import cookieSession from 'cookie-session';
+// import cookieSession from 'cookie-session';
 import { json } from 'body-parser';
 import { authRouter, ivrRouter, workersRouter } from './routes/';
 import {
@@ -22,19 +22,19 @@ app.use(
     origin: env.CORS_ORIGIN,
     credentials: true,
     // allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-    exposedHeaders: ['set-cookie'],
+    // exposedHeaders: ['set-cookie'],
   })
 );
 app.set('trust proxy', true);
 app.use(json());
-app.use(
+/* app.use(
   cookieSession({
     signed: false,
     name: 'session',
     httpOnly: false,
     // secure: process.env.NODE_ENV !== 'test',
   })
-);
+); */
 
 // Add id and email of current user if any to req.currentUser
 app.use(currentUser);

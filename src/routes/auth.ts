@@ -17,8 +17,7 @@ router.get('/users/currentuser', (req, res) => {
 });
 
 router.post('/users/signout', (req, res) => {
-  req.session = null;
-
+  // req.session = null;
   res.send({});
 });
 
@@ -48,14 +47,13 @@ router.post(
       throw new BadRequestError('Invalid credentials');
     }
 
-    req.session = {
-      jwt: JWT.sign({
+    res.status(200).send({
+      ...existingUser.toJSON(),
+      jwtToken: JWT.sign({
         id: existingUser.id,
         email: existingUser.email,
       }),
-    };
-
-    res.status(200).send(existingUser);
+    });
   }
 );
 

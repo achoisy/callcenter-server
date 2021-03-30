@@ -171,9 +171,6 @@ router.post(
 
     const { workerSid, friendlyName } = req.currentUser.worker;
 
-    if (!req.session) {
-      throw new BadRequestError('Session not found');
-    }
     // Add tokens to user session
     const tokens = {
       access: Twilio.createAccessToken(
