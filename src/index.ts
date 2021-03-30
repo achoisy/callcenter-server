@@ -1,6 +1,9 @@
 import { loadEnv, env } from './env-handler';
 import mongoose from 'mongoose';
 import { Config } from './models/config';
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
 
 // Loading env variables
 // Load before importing app
@@ -31,9 +34,28 @@ const start = async () => {
     console.log(error);
   }
 
-  app.listen(env.HTTP_PORT, () => {
-    console.log(`Listening on port ${env.HTTP_PORT}`);
-  });
+  if (env.NODE_ENV == 'production') {
+    const httpServer = http.createServer(app);
+    const httpsServer = https.createServer(
+      {
+        key: fs.readFileSync(env.SSL_PRIVKEY_PEM),
+        cert: fs.readFileSync(env.SSL_FULLCHAIN_PEM),
+      },
+      app
+    );
+
+    httpServer.listen(env.HTTP_PORT, () => {
+      console.log(`Production mode: Listening on port ${env.HTTP_PORT}`);
+    });
+
+    httpsServer.listen(env.HTTPS_PORT, () => {
+      console.log(`Production mode: Listening on port ${env.HTTPS_PORT}`);
+    });
+  } else {
+    app.listen(env.HTTP_PORT, () => {
+      console.log(`Devloppement mode: Listening on port ${env.HTTP_PORT}`);
+    });
+  }
 
   // Gracefull shutdown function
   const stop = async () => {

@@ -3,9 +3,26 @@ import { EnvType, load } from 'ts-dotenv';
 export type Env = EnvType<typeof schema>;
 
 export const schema = {
+  // Node env setup
+  NODE_ENV: ['production' as const, 'development' as const],
+
+  // Production setup
+  PROD_BASE_URL: String,
+  SSL_PRIVKEY_PEM: String,
+  SSL_FULLCHAIN_PEM: String,
+
+  // Developpement setup
+  DEV_BASE_URL: String,
+
+  // Mongodb
+  MONGODB_URL: String,
+
   // Ports
   HTTP_PORT: Number,
   HTTPS_PORT: Number,
+
+  // CORS origin
+  CORS_ORIGIN: String,
 
   // TWILIO Secrets
   TWILIO_ACCOUNT_SID: String,

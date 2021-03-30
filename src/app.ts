@@ -1,3 +1,4 @@
+import { env } from './env-handler';
 import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
@@ -18,7 +19,7 @@ const app = express();
 app.use(morgan('combined'));
 app.use(
   cors({
-    origin: 'http://localhost:8080',
+    origin: env.CORS_ORIGIN,
     credentials: true,
     // allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
     exposedHeaders: ['set-cookie'],
