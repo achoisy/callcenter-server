@@ -7,8 +7,8 @@ import { DatabaseConnectionError } from '../errors/';
 declare global {
   namespace Express {
     interface Request {
-      twilio: {
-        ivr: Ivr;
+      twilio?: {
+        ivr?: Ivr;
       };
     }
   }
@@ -28,7 +28,9 @@ export const configuration = async (
       );
     }
 
-    req.twilio.ivr = configuration.ivr;
+    req.twilio = {
+      ivr: configuration.ivr,
+    };
 
     if (req.path.includes('/ivr')) {
       res.set({
