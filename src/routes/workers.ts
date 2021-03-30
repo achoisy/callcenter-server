@@ -151,9 +151,9 @@ router.post(
   }
 );
 
-// Give worker access token and capability token
+// return worker with access token and capability token
 router.post(
-  '/login',
+  '/tokens',
   [
     body('applicationSid').notEmpty().withMessage('applicationSid est requis'),
     body('endpointId').notEmpty().withMessage('endpointId est requis'),
@@ -175,16 +175,16 @@ router.post(
       throw new BadRequestError('Session not found');
     }
     // Add tokens to user session
-    req.session.tokens = {
+    const tokens = {
       access: Twilio.createAccessToken(
         applicationSid,
         friendlyName,
         endpointId
       ),
-      worker: taskrouterWrapper.createWorkerTokens(workerSid),
+      capability: taskrouterWrapper.createWorkerTokens(workerSid),
     };
 
-    res.sendStatus(200);
+    res.send({ tokens });
   }
 );
 

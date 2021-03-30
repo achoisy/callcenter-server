@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JWT } from '../services/jwt-helper';
 import { UserPayload } from '../interfaces';
+import { User } from '../models/user';
 
 // Modify @types directly
 declare global {
@@ -11,7 +12,7 @@ declare global {
   }
 }
 
-export const currentUser = (
+export const currentUser = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -22,7 +23,22 @@ export const currentUser = (
 
   try {
     const payload = JWT.verify(req.session.jwt) as UserPayload;
-    req.currentUser = payload;
+    const currentUser = await User.findOne({ _id: payload.id });
+
+    if (!currentUser) {
+      return next();
+    }
+
+    req.currentUser = {
+      id: payload.id,
+      email: payload.email,
+      admin: currentUser.admin,
+      worker: {
+        workerSid: currentUser.worker?.workerSid,
+        friendlyName: currentUser.worker?.friendlyName,
+        attributes: JSON.parse(currentUser.worker?.attributes || ''),
+      },
+    };
   } catch (err) {}
 
   next();
