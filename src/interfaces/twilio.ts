@@ -63,6 +63,7 @@ export interface WorkersAttributes {
   name: string;
   channels: Channel[];
   service: Service[];
+  contact_uri: string;
 }
 
 export interface WorkerAttrs {

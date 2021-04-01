@@ -35,6 +35,7 @@ class Taskrouter {
   defaultAttributes(name: string): WorkersAttributes {
     return {
       name,
+      contact_uri: `client:${name}`,
       channels: [Channel.phone, Channel.callback],
       service: [Service.default],
     };
