@@ -104,7 +104,7 @@ router.get(
       phone: req.query.From,
       name: req.query.From,
       title: 'Appel entrant',
-      service: service.id,
+      service: service.friendlyName,
     };
 
     twimlVoice
@@ -134,7 +134,7 @@ router.get('/create-task', async (req, res) => {
     return IvrRequestError(`From not of type string: ${req.query.From}`);
   }
 
-  if (typeof req.query.serviceId !== 'string') {
+  if (typeof req.query.serviceFriendlyName !== 'string') {
     return IvrRequestError(
       `ServiceId not of type string: ${req.query.serviceId}`
     );
@@ -145,7 +145,7 @@ router.get('/create-task', async (req, res) => {
     text: `L'appelant a répondu au SVI avec l'option ${req.query.serviceFriendlyName}`,
     channel: Channel.callback,
     name: req.query.From,
-    service: req.query.serviceId,
+    service: req.query.serviceFriendlyName,
     phone: req.query.From,
   };
 
