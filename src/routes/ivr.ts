@@ -81,8 +81,9 @@ router.get(
     }
 
     const gather = twimlVoice.gather({
-      action: `create-task?serviceId=${service.id}
-        &serviceFriendlyName=${encodeURIComponent(service.friendlyName)}`,
+      action: `create-task?serviceId=${
+        service.id
+      }&serviceFriendlyName=${encodeURIComponent(service.friendlyName)}`,
       method: 'GET',
       numDigits: 1,
       timeout: 5,
