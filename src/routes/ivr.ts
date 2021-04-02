@@ -18,7 +18,7 @@ router.get('/welcome', async (req, res) => {
       'Une erreur est survenu dans le traitement de votre demande. Veuillez nous recontacter ulterieurement. Merci.'
     );
     twimlVoice.hangup();
-    return res.status(200).send(twiml.toString());
+    return res.status(200).send(twimlVoice.toString());
   };
 
   const gather = twimlVoice.gather({
@@ -55,7 +55,7 @@ router.get(
         'Une erreur est survenu dans le traitement de votre demande. Veuillez nous recontacter ulterieurement. Merci.'
       );
       twimlVoice.hangup();
-      return res.status(200).send(twiml.toString());
+      return res.status(200).send(twimlVoice.toString());
     };
 
     if (typeof req.query.Digits !== 'string') {
@@ -126,7 +126,7 @@ router.get('/create-task', async (req, res) => {
       'Une erreur est survenu dans le traitement de votre demande. Veuillez nous recontacter ulterieurement. Merci.'
     );
     twimlVoice.hangup();
-    return res.status(200).send(twiml.toString());
+    return res.status(200).send(twimlVoice.toString());
   };
 
   if (typeof req.query.From !== 'string') {
@@ -154,7 +154,7 @@ router.get('/create-task', async (req, res) => {
       'Merci pour votre demande de rappel, un agent va vous recontacter rapidement.'
     );
     twimlVoice.hangup();
-    res.status(200).send(twiml.toString());
+    res.status(200).send(twimlVoice.toString());
   } catch (error) {
     if (error instanceof CustomError) {
       throw error;
