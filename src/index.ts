@@ -44,9 +44,9 @@ const start = async () => {
       app
     );
 
-    httpServer.listen(env.HTTP_PORT, () => {
+    /*httpServer.listen(env.HTTP_PORT, () => {
       console.log(`Production mode: Listening on port ${env.HTTP_PORT}`);
-    });
+    }); */
 
     httpsServer.listen(env.HTTPS_PORT, () => {
       console.log(`Production mode: Listening on port ${env.HTTPS_PORT}`);
