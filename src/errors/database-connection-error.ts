@@ -29,3 +29,18 @@ export class TaskRouterError extends CustomError {
     return [{ message: `Twilio taskRouter error: ${this.message}` }];
   }
 }
+
+export class TwilioClientError extends CustomError {
+  statusCode = 400;
+
+  constructor(public message: string) {
+    super(message);
+
+    // Only because extending a built in class
+    Object.setPrototypeOf(this, TwilioClientError.prototype);
+  }
+
+  serializeErrors() {
+    return [{ message: `Twilio Client error: ${this.message}` }];
+  }
+}

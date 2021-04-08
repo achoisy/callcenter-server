@@ -185,4 +185,16 @@ router.post(
   }
 );
 
+router.get('/conference/:taskid', async (req, res) => {
+  try {
+    const conferences = await Twilio.getConferenceByName(req.params.taskid);
+    res.send(conferences);
+  } catch (error) {
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new Error(error);
+  }
+});
+
 export { router as workersRouter };

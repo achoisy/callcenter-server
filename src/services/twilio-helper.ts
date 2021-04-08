@@ -1,7 +1,11 @@
 import { env } from '../env-handler';
-import { jwt as TwilioJwt } from 'twilio';
+import twilio, { jwt as TwilioJwt } from 'twilio';
+import { TwilioClientError } from '../errors/';
 
 const AccessToken = TwilioJwt.AccessToken;
+const twilioClient = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN, {
+  accountSid: env.TWILIO_ACCOUNT_SID,
+});
 
 export class Twilio {
   // Create a twilio access token to give acces to user
@@ -41,5 +45,16 @@ export class Twilio {
 
     // return access token
     return accessToken.toJwt();
+  }
+
+  static async getConferenceByName(friendlyName: string) {
+    try {
+      return twilioClient.conferences.list({
+        friendlyName: friendlyName,
+        status: 'in-progress',
+      });
+    } catch (error) {
+      throw new TwilioClientError('Unable to get conference');
+    }
   }
 }
