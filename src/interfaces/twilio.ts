@@ -78,3 +78,8 @@ export interface WorkspacePolicyOptions {
   resources?: string[];
   method?: string;
 }
+
+export interface ConferenceParticipant {
+  callSid: string;
+  label: string;
+}

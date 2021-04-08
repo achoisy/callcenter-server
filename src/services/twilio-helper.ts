@@ -2,8 +2,7 @@ import { env } from '../env-handler';
 import twilio, { jwt as TwilioJwt } from 'twilio';
 import { TwilioClientError } from '../errors/';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
-import { ParticipantCodec } from 'twilio/lib/rest/insights/v1/room/participant';
-import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
+import { ConferenceParticipant } from '../interfaces';
 
 const AccessToken = TwilioJwt.AccessToken;
 const twilioClient = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN, {
@@ -75,15 +74,20 @@ export class Twilio {
 
   static async getConferenceParticipants(
     conferenceSid: string
-  ): Promise<string[]> {
+  ): Promise<ConferenceParticipant[]> {
     return new Promise((resolve, reject) => {
       try {
         twilioClient
           .conferences(conferenceSid)
           .participants.list()
           .then((participants) => {
-            const list: ParticipantInstance['callSid'][] = participants.map(
-              (participant) => participant.callSid
+            const list: ConferenceParticipant[] = participants.map(
+              (participant) => {
+                return {
+                  callSid: participant.callSid,
+                  label: participant.label,
+                };
+              }
             );
             resolve(list);
           });
