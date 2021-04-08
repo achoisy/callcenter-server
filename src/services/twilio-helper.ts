@@ -1,6 +1,9 @@
 import { env } from '../env-handler';
 import twilio, { jwt as TwilioJwt } from 'twilio';
 import { TwilioClientError } from '../errors/';
+import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
+import { ParticipantCodec } from 'twilio/lib/rest/insights/v1/room/participant';
+import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
 
 const AccessToken = TwilioJwt.AccessToken;
 const twilioClient = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN, {
@@ -47,14 +50,46 @@ export class Twilio {
     return accessToken.toJwt();
   }
 
-  static async getConferenceByName(friendlyName: string) {
-    try {
-      return twilioClient.conferences.list({
-        friendlyName: friendlyName,
-        status: 'in-progress',
-      });
-    } catch (error) {
-      throw new TwilioClientError('Unable to get conference');
-    }
+  static async getConferenceByName(
+    friendlyName: string
+  ): Promise<ConferenceInstance> {
+    return new Promise((resolve, reject) => {
+      try {
+        twilioClient.conferences
+          .list({
+            friendlyName: friendlyName,
+            status: 'in-progress',
+          })
+          .then((conferences) => {
+            if (conferences.length === 0) {
+              reject('NOT_FOUND');
+            } else {
+              resolve(conferences[0]);
+            }
+          });
+      } catch (error) {
+        throw new TwilioClientError('Unable to get conference');
+      }
+    });
+  }
+
+  static async getConferenceParticipants(
+    conferenceSid: string
+  ): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      try {
+        twilioClient
+          .conferences(conferenceSid)
+          .participants.list()
+          .then((participants) => {
+            const list: ParticipantInstance['callSid'][] = participants.map(
+              (participant) => participant.callSid
+            );
+            resolve(list);
+          });
+      } catch (error) {
+        throw new TwilioClientError('Unable to get conference participants');
+      }
+    });
   }
 }

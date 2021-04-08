@@ -187,8 +187,21 @@ router.post(
 
 router.get('/conference/:taskid', async (req, res) => {
   try {
-    const conferences = await Twilio.getConferenceByName(req.params.taskid);
-    res.send(conferences);
+    let conferenceSid: string;
+
+    Twilio.getConferenceByName(req.params.taskid)
+      .then((conference) => {
+        conferenceSid = conference.sid;
+        return Twilio.getConferenceParticipants(conference.sid);
+      })
+      .then((participants) => {
+        res.send({
+          conference: {
+            sid: conferenceSid,
+            participants: participants,
+          },
+        });
+      });
   } catch (error) {
     if (error instanceof CustomError) {
       throw error;
