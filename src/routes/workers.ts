@@ -185,29 +185,4 @@ router.post(
   }
 );
 
-router.get('/conference/:taskid', async (req, res) => {
-  try {
-    let conferenceSid: string;
-
-    Twilio.getConferenceByName(req.params.taskid)
-      .then((conference) => {
-        conferenceSid = conference.sid;
-        return Twilio.getConferenceParticipants(conference.sid);
-      })
-      .then((participants) => {
-        res.send({
-          conference: {
-            sid: conferenceSid,
-            participants: participants,
-          },
-        });
-      });
-  } catch (error) {
-    if (error instanceof CustomError) {
-      throw error;
-    }
-    throw new Error(error);
-  }
-});
-
 export { router as workersRouter };

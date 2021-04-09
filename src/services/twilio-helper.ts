@@ -2,6 +2,7 @@ import { env } from '../env-handler';
 import twilio, { jwt as TwilioJwt } from 'twilio';
 import { TwilioClientError } from '../errors/';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
+import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
 import { ConferenceParticipant } from '../interfaces';
 
 const AccessToken = TwilioJwt.AccessToken;
@@ -49,7 +50,7 @@ export class Twilio {
     return accessToken.toJwt();
   }
 
-  static async getConferenceByName(
+  static getConferenceByName(
     friendlyName: string
   ): Promise<ConferenceInstance> {
     return new Promise((resolve, reject) => {
@@ -72,7 +73,7 @@ export class Twilio {
     });
   }
 
-  static async getConferenceParticipants(
+  static getConferenceParticipants(
     conferenceSid: string
   ): Promise<ConferenceParticipant[]> {
     return new Promise((resolve, reject) => {
@@ -93,6 +94,28 @@ export class Twilio {
           });
       } catch (error) {
         throw new TwilioClientError('Unable to get conference participants');
+      }
+    });
+  }
+
+  static setConferenceParticipantHold(
+    conferenceSid: string,
+    callSid: string,
+    hold: boolean
+  ): Promise<ParticipantInstance> {
+    return new Promise((resolve, reject) => {
+      try {
+        twilioClient
+          .conferences(conferenceSid)
+          .participants(callSid)
+          .update({ hold: hold })
+          .then((participant) => {
+            resolve(participant);
+          });
+      } catch (error) {
+        throw new TwilioClientError(
+          'Unable to set conference participant on hold'
+        );
       }
     });
   }

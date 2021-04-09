@@ -44,3 +44,18 @@ export class TwilioClientError extends CustomError {
     return [{ message: `Twilio Client error: ${this.message}` }];
   }
 }
+
+export class PhoneRouterError extends CustomError {
+  statusCode = 400;
+
+  constructor(public message: string) {
+    super(message);
+
+    // Only because extending a built in class
+    Object.setPrototypeOf(this, TwilioClientError.prototype);
+  }
+
+  serializeErrors() {
+    return [{ message: `Twilio Phone error: ${this.message}` }];
+  }
+}

@@ -6,7 +6,7 @@ import cors from 'cors';
 import 'express-async-errors';
 // import cookieSession from 'cookie-session';
 import { json } from 'body-parser';
-import { authRouter, ivrRouter, workersRouter } from './routes/';
+import { authRouter, ivrRouter, workersRouter, phoneRouter } from './routes/';
 import {
   errorHandler,
   currentUser,
@@ -42,6 +42,7 @@ app.use(currentUser);
 app.use('/auth', authRouter);
 
 app.use('/workers', requireAuth, workersRouter);
+app.use('/phone', requireAuth, phoneRouter);
 // app.use('/workers', workersRouter);
 
 // Configuration middleware

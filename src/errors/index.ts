@@ -1,4 +1,4 @@
-export * from './database-connection-error';
+export * from './error-class-set';
 export * from './request-validation-error';
 export * from './bad-request-error';
 export * from './not-found-error';
