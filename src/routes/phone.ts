@@ -47,6 +47,7 @@ router.post(
   '/conference/:confsid/add-participant/:phone',
   query('taskId').isString().notEmpty(),
   validateRequest,
+  configuration,
   (req: Request, res: Response) => {
     const { confsid, phone } = req.params;
     const { taskId } = req.query;
