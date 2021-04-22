@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { Twilio } from '../services/twilio-helper';
 import { twiml } from 'twilio';
 import { body } from 'express-validator';
-import { validateRequest, configuration } from '../middlewares/';
+import { validateRequest, configuration, requireAuth } from '../middlewares/';
 import { PhoneRouterError, CustomError } from '../errors/';
 
 const router = express.Router();
@@ -42,6 +42,7 @@ router.post(
 
 router.post(
   '/conference/:confsid/add-participant/:phone',
+  requireAuth,
   [body('CallSid').isString().notEmpty().withMessage('Must provide CallSid')],
   validateRequest,
   (req: Request, res: Response) => {
@@ -77,7 +78,7 @@ router.post(
   }
 );
 
-router.get('/conference/:taskid', (req, res) => {
+router.get('/conference/:taskid', requireAuth, (req, res) => {
   try {
     let conferenceSid: string;
 
@@ -104,6 +105,7 @@ router.get('/conference/:taskid', (req, res) => {
 
 router.post(
   '/hold',
+  requireAuth,
   [
     body('conferenceSid')
       .isString()
