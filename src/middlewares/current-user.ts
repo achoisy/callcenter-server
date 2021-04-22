@@ -18,13 +18,26 @@ export const currentUser = async (
   next: NextFunction
 ) => {
   const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
+  let token: string = '';
+
+  // We can pass the token either thru headers or thru query params ?token=xxxxxx
+  if (!authHeader) {
+    token = req.query.token ? String(req.query.token) : '';
+  } else {
+    token = authHeader && authHeader.split(' ')[1];
+  }
+
   if (!token) {
     return next();
   }
 
   try {
     const payload = JWT.verify(token) as UserPayload;
+
+    if (!payload.id) {
+      return next();
+    }
+
     const currentUser = await User.findOne({ _id: payload.id });
 
     if (!currentUser) {

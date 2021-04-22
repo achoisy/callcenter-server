@@ -42,7 +42,7 @@ app.use(currentUser);
 app.use('/auth', authRouter);
 
 app.use('/workers', requireAuth, workersRouter);
-app.use('/phone', phoneRouter);
+app.use('/phone', requireAuth, phoneRouter);
 // app.use('/workers', workersRouter);
 
 // Configuration middleware

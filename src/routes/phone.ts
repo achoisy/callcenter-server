@@ -1,43 +1,58 @@
 import express, { Request, Response } from 'express';
 import { Twilio } from '../services/twilio-helper';
 import { twiml } from 'twilio';
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 import { validateRequest, configuration, requireAuth } from '../middlewares/';
 import { PhoneRouterError, CustomError } from '../errors/';
 
 const router = express.Router();
 
-router.post('/call/:phone', configuration, (req: Request, res: Response) => {
-  const { phone, CallSid } = req.params;
-  const twimlVoice = new twiml.VoiceResponse();
+router.post(
+  '/call/:phone',
+  [
+    query('CallSid').isString().notEmpty(),
+    query('token').isString().notEmpty(),
+  ],
+  validateRequest,
+  configuration,
+  (req: Request, res: Response) => {
+    const { phone } = req.params;
+    const { CallSid, token } = req.query;
 
-  if (!req.twilio) {
-    throw new Error('phone call error: missing twilio configuration');
+    const twimlVoice = new twiml.VoiceResponse();
+
+    if (!req.twilio) {
+      throw new Error('phone call error: missing twilio configuration');
+    }
+
+    if (typeof CallSid !== 'string') {
+      throw new PhoneRouterError('CallSid not of type string');
+    }
+
+    const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
+
+    dial.conference(
+      {
+        endConferenceOnExit: true,
+        statusCallbackEvent: ['join'],
+        statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
+          phone
+        )}?token=${token}`,
+      },
+      CallSid
+    );
+
+    res.send(twimlVoice.toString());
   }
-
-  const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
-
-  dial.conference(
-    {
-      endConferenceOnExit: true,
-      statusCallbackEvent: ['join'],
-      statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
-        phone
-      )}`,
-    },
-    CallSid
-  );
-
-  res.send(twimlVoice.toString());
-});
+);
 
 router.post(
   '/conference/:confsid/add-participant/:phone',
-  requireAuth,
-  [body('CallSid').isString().notEmpty().withMessage('Must provide CallSid')],
+  query('CallSid').isString().notEmpty(),
   validateRequest,
   (req: Request, res: Response) => {
-    const { CallSid, confsid, phone } = req.params;
+    const { confsid, phone } = req.params;
+    const { CallSid } = req.query;
 
     if (!req.twilio) {
       throw new Error(
@@ -68,7 +83,7 @@ router.post(
   }
 );
 
-router.get('/conference/:taskid', requireAuth, (req, res) => {
+router.get('/conference/:taskid', (req, res) => {
   try {
     let conferenceSid: string;
 
@@ -95,7 +110,6 @@ router.get('/conference/:taskid', requireAuth, (req, res) => {
 
 router.post(
   '/hold',
-  requireAuth,
   [
     body('conferenceSid')
       .isString()
