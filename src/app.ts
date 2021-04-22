@@ -46,9 +46,9 @@ app.use('/phone', requireAuth, phoneRouter);
 // app.use('/workers', workersRouter);
 
 // Configuration middleware
-app.use(configuration);
+// app.use(configuration);
 
-app.use('/ivr', ivrRouter);
+app.use('/ivr', configuration, ivrRouter);
 
 // Not Found route
 app.all('*', async (req, res) => {

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Ivr } from '../interfaces';
+import { Ivr, TwilioSetup } from '../interfaces';
 import { Config } from '../models/config';
 import { DatabaseConnectionError } from '../errors/';
 
@@ -9,6 +9,7 @@ declare global {
     interface Request {
       twilio?: {
         ivr: Ivr;
+        setup: TwilioSetup;
       };
     }
   }
@@ -30,9 +31,15 @@ export const configuration = async (
 
     req.twilio = {
       ivr: configuration.ivr,
+      setup: configuration.twilio,
     };
 
-    if (req.path.includes('/ivr')) {
+    res.set({
+      'Content-Type': 'application/xml',
+      'Cache-Control': 'public, max-age=0',
+    });
+
+    /* if (req.path.includes('/ivr')) {
       res.set({
         'Content-Type': 'application/xml',
         'Cache-Control': 'public, max-age=0',
@@ -42,7 +49,7 @@ export const configuration = async (
         'Content-Type': 'application/json',
         'Cache-Control': 'public, max-age=0',
       });
-    }
+    } */
   } catch (error) {}
 
   next();
