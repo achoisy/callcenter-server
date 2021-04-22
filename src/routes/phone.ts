@@ -7,38 +7,29 @@ import { PhoneRouterError, CustomError } from '../errors/';
 
 const router = express.Router();
 
-router.post(
-  '/call',
-  [
-    body('CallSid').isString().notEmpty().withMessage('Must provide CallSid'),
-    body('phone').isString().notEmpty().withMessage('Must provide phone'),
-  ],
-  validateRequest,
-  configuration,
-  (req: Request, res: Response) => {
-    const { CallSid, phone } = req.body;
-    const twimlVoice = new twiml.VoiceResponse();
+router.post('/call/:phone', configuration, (req: Request, res: Response) => {
+  const { phone, CallSid } = req.params;
+  const twimlVoice = new twiml.VoiceResponse();
 
-    if (!req.twilio) {
-      throw new Error('phone call error: missing twilio configuration');
-    }
-
-    const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
-
-    dial.conference(
-      {
-        endConferenceOnExit: true,
-        statusCallbackEvent: ['join'],
-        statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
-          phone
-        )}`,
-      },
-      CallSid
-    );
-
-    res.send(twimlVoice.toString());
+  if (!req.twilio) {
+    throw new Error('phone call error: missing twilio configuration');
   }
-);
+
+  const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
+
+  dial.conference(
+    {
+      endConferenceOnExit: true,
+      statusCallbackEvent: ['join'],
+      statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
+        phone
+      )}`,
+    },
+    CallSid
+  );
+
+  res.send(twimlVoice.toString());
+});
 
 router.post(
   '/conference/:confsid/add-participant/:phone',
@@ -46,8 +37,7 @@ router.post(
   [body('CallSid').isString().notEmpty().withMessage('Must provide CallSid')],
   validateRequest,
   (req: Request, res: Response) => {
-    const { confsid, phone } = req.params;
-    const { CallSid } = req.body;
+    const { CallSid, confsid, phone } = req.params;
 
     if (!req.twilio) {
       throw new Error(
