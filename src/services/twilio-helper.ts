@@ -119,4 +119,28 @@ export class Twilio {
       }
     });
   }
+
+  static createConferenceCall(
+    conferenceSid: string,
+    callerId: string,
+    phone: string
+  ): Promise<ParticipantInstance> {
+    return new Promise((resolve, reject) => {
+      try {
+        twilioClient
+          .conferences(conferenceSid)
+          .participants.create({
+            to: phone,
+            from: callerId,
+            earlyMedia: true,
+            endConferenceOnExit: true,
+          })
+          .then((participant) => {
+            resolve(participant);
+          });
+      } catch (error) {
+        throw new TwilioClientError('Unable to create conference call');
+      }
+    });
+  }
 }

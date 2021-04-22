@@ -1,10 +1,81 @@
 import express, { Request, Response } from 'express';
 import { Twilio } from '../services/twilio-helper';
+import { twiml } from 'twilio';
 import { body } from 'express-validator';
-import { validateRequest } from '../middlewares/';
+import { validateRequest, configuration } from '../middlewares/';
 import { PhoneRouterError, CustomError } from '../errors/';
 
 const router = express.Router();
+
+router.post(
+  '/call',
+  [
+    body('CallSid').isString().notEmpty().withMessage('Must provide CallSid'),
+    body('phone').isString().notEmpty().withMessage('Must provide phone'),
+  ],
+  validateRequest,
+  configuration,
+  (req: Request, res: Response) => {
+    const { CallSid, phone } = req.body;
+    const twimlVoice = new twiml.VoiceResponse();
+
+    if (!req.twilio) {
+      throw new Error('phone call error: missing twilio configuration');
+    }
+
+    const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
+
+    dial.conference(
+      {
+        endConferenceOnExit: true,
+        statusCallbackEvent: ['join'],
+        statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
+          phone
+        )}`,
+      },
+      CallSid
+    );
+
+    res.send(twimlVoice.toString());
+  }
+);
+
+router.post(
+  '/conference/:confsid/add-participant/:phone',
+  [body('CallSid').isString().notEmpty().withMessage('Must provide CallSid')],
+  validateRequest,
+  (req: Request, res: Response) => {
+    const { confsid, phone } = req.params;
+    const { CallSid } = req.body;
+
+    if (!req.twilio) {
+      throw new Error(
+        'conference add participant error: missing twilio configuration'
+      );
+    }
+
+    // Check if conference add-participent request is made by the agent or else
+    if (CallSid == confsid) {
+      // Agent has join, we can now make the call to other party
+      try {
+        Twilio.createConferenceCall(
+          confsid,
+          req.twilio.setup.callerId,
+          phone
+        ).then((participant) => {
+          res.status(200).end();
+        });
+      } catch (error) {
+        if (error instanceof CustomError) {
+          throw error;
+        }
+        throw new Error(error);
+      }
+    } else {
+      res.status(200).end;
+    }
+  }
+);
 
 router.get('/conference/:taskid', (req, res) => {
   try {
