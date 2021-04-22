@@ -52,7 +52,7 @@ export class PhoneRouterError extends CustomError {
     super(message);
 
     // Only because extending a built in class
-    Object.setPrototypeOf(this, TwilioClientError.prototype);
+    Object.setPrototypeOf(this, PhoneRouterError.prototype);
   }
 
   serializeErrors() {
