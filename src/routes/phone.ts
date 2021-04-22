@@ -37,7 +37,7 @@ router.post(
         statusCallbackEvent: ['join'],
         statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
           phone
-        )}?token=${token}`,
+        )}?token=${token}&CallSid=${CallSid}`,
       },
       CallSid
     );
