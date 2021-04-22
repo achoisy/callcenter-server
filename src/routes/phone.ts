@@ -9,15 +9,12 @@ const router = express.Router();
 
 router.post(
   '/call/:phone',
-  [
-    query('CallSid').isString().notEmpty(),
-    query('token').isString().notEmpty(),
-  ],
+  [query('taskId').isString().notEmpty(), query('token').isString().notEmpty()],
   validateRequest,
   configuration,
   (req: Request, res: Response) => {
     const { phone } = req.params;
-    const { CallSid, token } = req.query;
+    const { taskId, token } = req.query;
 
     const twimlVoice = new twiml.VoiceResponse();
 
@@ -25,8 +22,8 @@ router.post(
       throw new Error('phone call error: missing twilio configuration');
     }
 
-    if (typeof CallSid !== 'string') {
-      throw new PhoneRouterError('CallSid not of type string');
+    if (typeof taskId !== 'string') {
+      throw new PhoneRouterError('taskId not of type string');
     }
 
     const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
@@ -35,11 +32,11 @@ router.post(
       {
         endConferenceOnExit: true,
         statusCallbackEvent: ['join'],
-        statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
+        statusCallback: `/phone/conference/${taskId}/add-participant/${encodeURIComponent(
           phone
-        )}?token=${token}&CallSid=${CallSid}`,
+        )}?token=${token}&taskId=${taskId}`,
       },
-      CallSid
+      taskId
     );
 
     res.send(twimlVoice.toString());
@@ -48,11 +45,11 @@ router.post(
 
 router.post(
   '/conference/:confsid/add-participant/:phone',
-  query('CallSid').isString().notEmpty(),
+  query('taskId').isString().notEmpty(),
   validateRequest,
   (req: Request, res: Response) => {
     const { confsid, phone } = req.params;
-    const { CallSid } = req.query;
+    const { taskId } = req.query;
 
     if (!req.twilio) {
       throw new Error(
@@ -61,7 +58,7 @@ router.post(
     }
 
     // Check if conference add-participent request is made by the agent or else
-    if (CallSid == confsid) {
+    if (taskId == confsid) {
       // Agent has join, we can now make the call to other party
       try {
         Twilio.createConferenceCall(
