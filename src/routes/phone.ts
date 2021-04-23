@@ -10,12 +10,12 @@ const router = express.Router();
 
 router.post(
   '/call/:phone',
-  [query('CallSid').isString().notEmpty()],
+  [body('CallSid').isString().notEmpty()],
   validateRequest,
   configuration,
   (req: Request, res: Response) => {
     const { phone } = req.params;
-    const { CallSid } = req.query;
+    const { CallSid } = req.body;
     const token = req.currentUser!.token;
 
     const twimlVoice = new twiml.VoiceResponse();
@@ -49,12 +49,12 @@ router.post(
 
 router.post(
   '/conference/:confsid/add-participant/:phone',
-  query('CallSid').isString().notEmpty(),
+  body('CallSid').isString().notEmpty(),
   validateRequest,
   configuration,
   (req: Request, res: Response) => {
     const { confsid, phone } = req.params;
-    const { CallSid } = req.query;
+    const { CallSid } = req.body;
 
     if (!req.twilio) {
       throw new Error(
