@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import { env } from '../env-handler';
 import { Twilio } from '../services/twilio-helper';
 import { twiml } from 'twilio';
 import { body, query } from 'express-validator';
@@ -24,21 +23,15 @@ router.post(
       throw new Error('phone call error: missing twilio configuration');
     }
 
-    /* if (typeof CallSid !== 'string') {
-      throw new PhoneRouterError('taskId not of type string');
-    } */
-
     const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
 
     dial.conference(
       {
         endConferenceOnExit: true,
         statusCallbackEvent: ['join'],
-        statusCallback: `${
-          env.API_TOKEN_URI
-        }/${token}/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
+        statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
           phone
-        )}`,
+        )}?token=${token}`,
       },
       String(CallSid)
     );

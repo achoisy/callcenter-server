@@ -5,7 +5,7 @@ import cors from 'cors';
 // import bodyParser from 'body-parser';
 import 'express-async-errors';
 // import cookieSession from 'cookie-session';
-import { json } from 'body-parser';
+import { json, urlencoded } from 'body-parser';
 import { authRouter, ivrRouter, workersRouter, phoneRouter } from './routes/';
 import {
   errorHandler,
@@ -27,6 +27,14 @@ app.use(
 );
 app.set('trust proxy', true);
 app.use(json());
+
+// Map parameters to body if not in json format
+app.use(
+  urlencoded({
+    extended: true,
+  })
+);
+
 /* app.use(
   cookieSession({
     signed: false,
