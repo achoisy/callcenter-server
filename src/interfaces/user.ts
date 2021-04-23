@@ -9,4 +9,5 @@ export interface UserPayload {
     friendlyName?: string;
     attributes?: WorkersAttributes;
   };
+  token: string;
 }

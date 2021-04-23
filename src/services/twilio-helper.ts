@@ -120,7 +120,7 @@ export class Twilio {
     });
   }
 
-  static createConferenceCall(
+  static addParticipantToConference(
     conferenceSid: string,
     callerId: string,
     phone: string

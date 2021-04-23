@@ -14,6 +14,9 @@ export const schema = {
   // Developpement setup
   DEV_BASE_URL: String,
 
+  // API token route
+  API_TOKEN_URI: String,
+
   // Mongodb
   MONGODB_URL: String,
 

@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { env } from '../env-handler';
 import { Twilio } from '../services/twilio-helper';
 import { twiml } from 'twilio';
 import { body, query } from 'express-validator';
@@ -9,12 +10,13 @@ const router = express.Router();
 
 router.post(
   '/call/:phone',
-  [query('taskId').isString().notEmpty(), query('token').isString().notEmpty()],
+  [query('CallSid').isString().notEmpty()],
   validateRequest,
   configuration,
   (req: Request, res: Response) => {
     const { phone } = req.params;
-    const { taskId, token } = req.query;
+    const { CallSid } = req.query;
+    const token = req.currentUser!.token;
 
     const twimlVoice = new twiml.VoiceResponse();
 
@@ -22,9 +24,9 @@ router.post(
       throw new Error('phone call error: missing twilio configuration');
     }
 
-    if (typeof taskId !== 'string') {
+    /* if (typeof CallSid !== 'string') {
       throw new PhoneRouterError('taskId not of type string');
-    }
+    } */
 
     const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
 
@@ -32,11 +34,13 @@ router.post(
       {
         endConferenceOnExit: true,
         statusCallbackEvent: ['join'],
-        statusCallback: `/phone/conference/${taskId}/add-participant/${encodeURIComponent(
+        statusCallback: `${
+          env.API_TOKEN_URI
+        }/${token}/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
           phone
-        )}?token=${token}&taskId=${taskId}`,
+        )}`,
       },
-      taskId
+      String(CallSid)
     );
 
     res.send(twimlVoice.toString());
@@ -45,12 +49,12 @@ router.post(
 
 router.post(
   '/conference/:confsid/add-participant/:phone',
-  query('taskId').isString().notEmpty(),
+  query('CallSid').isString().notEmpty(),
   validateRequest,
   configuration,
   (req: Request, res: Response) => {
     const { confsid, phone } = req.params;
-    const { taskId } = req.query;
+    const { CallSid } = req.query;
 
     if (!req.twilio) {
       throw new Error(
@@ -59,10 +63,10 @@ router.post(
     }
 
     // Check if conference add-participent request is made by the agent or else
-    if (taskId == confsid) {
+    if (CallSid == confsid) {
       // Agent has join, we can now make the call to other party
       try {
-        Twilio.createConferenceCall(
+        Twilio.addParticipantToConference(
           confsid,
           req.twilio.setup.callerId,
           phone
@@ -81,11 +85,11 @@ router.post(
   }
 );
 
-router.get('/conference/:taskid', (req, res) => {
+router.get('/conference/:confsid', (req, res) => {
   try {
     let conferenceSid: string;
 
-    Twilio.getConferenceByName(req.params.taskid)
+    Twilio.getConferenceByName(req.params.confsid)
       .then((conference) => {
         conferenceSid = conference.sid;
         return Twilio.getConferenceParticipants(conference.sid);

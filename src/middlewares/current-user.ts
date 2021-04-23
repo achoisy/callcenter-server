@@ -20,6 +20,13 @@ export const currentUser = async (
   const authHeader = req.headers.authorization;
   let token: string = '';
 
+  // API twilio request auth process
+  const regex = /^\/apitoken\/.*/;
+  if (regex.test(req.url)) {
+    req.query.token = req.url.split('/')[2];
+    req.url = req.url.split(`/apitoken/${req.query.token}`)[1];
+  }
+
   // We can pass the token either thru headers or thru query params ?token=xxxxxx
   if (!authHeader) {
     token = req.query.token ? String(req.query.token) : '';
@@ -53,6 +60,7 @@ export const currentUser = async (
         friendlyName: currentUser.worker?.friendlyName,
         attributes: JSON.parse(currentUser.worker?.attributes || ''),
       },
+      token: token,
     };
   } catch (err) {}
 
