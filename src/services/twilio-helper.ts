@@ -3,6 +3,10 @@ import twilio, { jwt as TwilioJwt } from 'twilio';
 import { TwilioClientError } from '../errors/';
 import { ConferenceInstance } from 'twilio/lib/rest/api/v2010/account/conference';
 import { ParticipantInstance } from 'twilio/lib/rest/api/v2010/account/conference/participant';
+import {
+  ReservationInstanceUpdateOptions,
+  ReservationInstance,
+} from 'twilio/lib/rest/taskrouter/v1/workspace/worker/reservation';
 import { ConferenceParticipant } from '../interfaces';
 
 const AccessToken = TwilioJwt.AccessToken;
@@ -140,6 +144,29 @@ export class Twilio {
           });
       } catch (error) {
         throw new TwilioClientError('Unable to create conference call');
+      }
+    });
+  }
+
+  static reservationUpdate(
+    workerSid: string,
+    reservationSid: string,
+    params: ReservationInstanceUpdateOptions
+  ): Promise<ReservationInstance> {
+    return new Promise((resolve, reject) => {
+      try {
+        twilioClient.taskrouter
+          .workspaces(env.TWILIO_WORKSPACE_SID)
+          .workers(workerSid)
+          .reservations(reservationSid)
+          .update(params)
+          .then((reservation) => {
+            resolve(reservation);
+          });
+      } catch (error) {
+        throw new TwilioClientError(
+          `Unable to accept reservation:${reservationSid} for worker:${workerSid}`
+        );
       }
     });
   }

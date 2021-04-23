@@ -16,6 +16,9 @@ router.post(
     const { phone } = req.params;
     const { CallSid } = req.body;
     const token = req.currentUser!.token;
+    const reservation = req.query.reservation
+      ? String(req.query.reservation)
+      : '';
 
     const twimlVoice = new twiml.VoiceResponse();
 
@@ -31,7 +34,7 @@ router.post(
         statusCallbackEvent: ['join'],
         statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
           phone
-        )}?token=${token}`,
+        )}?token=${token}&reservation=${reservation}`,
       },
       String(CallSid)
     );
@@ -48,6 +51,9 @@ router.post(
   (req: Request, res: Response) => {
     const { confsid, phone } = req.params;
     const { CallSid } = req.body;
+    const reservation = req.query.reservation
+      ? String(req.query.reservation)
+      : '';
 
     if (!req.twilio) {
       throw new Error(
@@ -73,6 +79,14 @@ router.post(
         throw new Error(error);
       }
     } else {
+      // User as join the call. Accept reservation for initial worker
+      if (reservation) {
+        Twilio.reservationUpdate(
+          req.currentUser?.worker.workerSid!,
+          reservation,
+          { reservationStatus: 'accepted' }
+        );
+      }
       res.status(200).end;
     }
   }
