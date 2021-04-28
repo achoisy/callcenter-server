@@ -12,6 +12,7 @@ import {
   currentUser,
   configuration,
   requireAuth,
+  xmlHeader,
 } from './middlewares/';
 import { NotFoundError } from './errors/';
 
@@ -35,28 +36,16 @@ app.use(
   })
 );
 
-/* app.use(
-  cookieSession({
-    signed: false,
-    name: 'session',
-    httpOnly: false,
-    // secure: process.env.NODE_ENV !== 'test',
-  })
-); */
-
 // Add id and email of current user if any to req.currentUser
 app.use(currentUser);
 
 app.use('/auth', authRouter);
 
 app.use('/workers', requireAuth, workersRouter);
+
 app.use('/phone', requireAuth, phoneRouter);
-// app.use('/workers', workersRouter);
 
-// Configuration middleware
-// app.use(configuration);
-
-app.use('/ivr', configuration, ivrRouter);
+app.use('/ivr', xmlHeader, configuration, ivrRouter);
 
 // Not Found route
 app.all('*', async (req, res) => {

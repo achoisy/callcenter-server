@@ -33,23 +33,6 @@ export const configuration = async (
       ivr: configuration.ivr,
       setup: configuration.twilio,
     };
-
-    res.set({
-      'Content-Type': 'application/xml',
-      'Cache-Control': 'public, max-age=0',
-    });
-
-    /* if (req.path.includes('/ivr')) {
-      res.set({
-        'Content-Type': 'application/xml',
-        'Cache-Control': 'public, max-age=0',
-      });
-    } else {
-      res.set({
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=0',
-      });
-    } */
   } catch (error) {}
 
   next();

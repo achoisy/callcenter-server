@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import { Twilio } from '../services/twilio-helper';
 import { twiml } from 'twilio';
-import { body, query } from 'express-validator';
-import { validateRequest, configuration, requireAuth } from '../middlewares/';
+import { body } from 'express-validator';
+import { validateRequest, configuration, xmlHeader } from '../middlewares/';
 import { PhoneRouterError, CustomError } from '../errors/';
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.post(
   '/call/:phone',
   [body('CallSid').isString().notEmpty()],
   validateRequest,
+  xmlHeader,
   configuration,
   (req: Request, res: Response) => {
     const { phone } = req.params;
@@ -26,6 +27,7 @@ router.post(
       throw new Error('phone call error: missing twilio configuration');
     }
 
+    twimlVoice.say('Nous recherchons votre correspondant, veuillez patienter.');
     const dial = twimlVoice.dial({ callerId: req.twilio.setup.callerId });
 
     dial.conference(
