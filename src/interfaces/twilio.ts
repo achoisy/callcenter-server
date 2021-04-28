@@ -1,8 +1,17 @@
 export enum Channel {
-  phone = 'phone',
+  phone = 'phone', // Incoming call
   callback = 'callback',
   chat = 'chat',
   video = 'video',
+  call = 'call', // Outgoing call
+}
+
+export enum TaskChannel {
+  default = 'default',
+  voice = 'voice',
+  chat = 'chat',
+  sms = 'sms',
+  video = ' video',
 }
 
 export enum Service {
@@ -36,6 +45,8 @@ export interface TwilioSetup {
   callerId: string;
   applicationSid: string;
   workflowSid: string;
+  anyoneWorkflowSid: string;
+  someoneWorkflowSid: string;
   facebookPageId: string;
   voice: {
     recording: boolean;
@@ -50,13 +61,14 @@ export interface TwilioConfiguration {
   default: boolean;
 }
 
-export interface TaskrouterAttriutes {
+export interface TaskrouterAttributes {
   title: string;
   text: string;
   channel: Channel;
   phone: string;
   name: string;
   service: string;
+  contact_uri?: string;
 }
 
 export interface WorkersAttributes {

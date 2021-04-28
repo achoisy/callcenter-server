@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import { query } from 'express-validator';
 import { validateRequest } from '../middlewares/';
 import { twiml } from 'twilio';
-import { TaskrouterAttriutes, Channel } from '../interfaces';
+import { TaskrouterAttributes, Channel, TaskChannel } from '../interfaces';
 import { taskrouterWrapper } from '../services/taskrouter-helper';
 import { CustomError } from '../errors';
 
@@ -98,7 +98,7 @@ router.get(
     }
 
     /* create task attributes */
-    const attributes: TaskrouterAttriutes = {
+    const attributes: TaskrouterAttributes = {
       text: `L'appelant a répondu au SVI avec l'option ${service.friendlyName}`,
       channel: Channel.phone,
       phone: req.query.From,
@@ -130,6 +130,10 @@ router.get('/create-task', async (req, res) => {
     return res.status(200).send(twimlVoice.toString());
   };
 
+  if (!req.twilio) {
+    return IvrRequestError('configuration IVR');
+  }
+
   if (typeof req.query.From !== 'string') {
     return IvrRequestError(`From not of type string: ${req.query.From}`);
   }
@@ -140,7 +144,7 @@ router.get('/create-task', async (req, res) => {
     );
   }
 
-  const attributes: TaskrouterAttriutes = {
+  const attributes: TaskrouterAttributes = {
     title: 'Demande de rappel',
     text: `L'appelant a répondu au SVI avec l'option ${req.query.serviceFriendlyName}`,
     channel: Channel.callback,
@@ -150,7 +154,12 @@ router.get('/create-task', async (req, res) => {
   };
 
   try {
-    await taskrouterWrapper.createTask(attributes);
+    await taskrouterWrapper.createTask({
+      attributes,
+      worflowSid: req.twilio.setup.workflowSid,
+      timeout: 720, // TODO: add timer to twilio setup or else
+      taskChannel: TaskChannel.voice,
+    });
     twimlVoice.say(
       'Merci pour votre demande de rappel, un agent va vous recontacter rapidement.'
     );

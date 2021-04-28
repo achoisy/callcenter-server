@@ -1,10 +1,11 @@
 import { env } from '../env-handler';
 import twilio from 'twilio';
 import {
-  TaskrouterAttriutes,
+  TaskrouterAttributes,
   TwilioSetup,
   WorkersAttributes,
   Channel,
+  TaskChannel,
   Service,
   WorkerAttrs,
   WorkspacePolicyOptions,
@@ -69,13 +70,23 @@ class Taskrouter {
   }
 
   // Create a new task in twilio taskrouter for specified callcenter
-  async createTask(attributes: TaskrouterAttriutes) {
+  async createTask({
+    attributes,
+    worflowSid,
+    timeout,
+    taskChannel,
+  }: {
+    attributes: TaskrouterAttributes;
+    worflowSid: string;
+    timeout: number;
+    taskChannel: TaskChannel;
+  }) {
     try {
       const payload = {
-        workflowSid: this.twilioSetup.workflowSid,
+        workflowSid: worflowSid,
         attributes: JSON.stringify(attributes),
-        timeout: 3600,
-        taskChannel: 'voice',
+        timeout: timeout,
+        taskChannel: taskChannel,
       };
       const newTask = await twilioClient.taskrouter
         .workspaces(env.TWILIO_WORKSPACE_SID)

@@ -40,6 +40,8 @@ const configSchema = new mongoose.Schema(
       callerId: String,
       applicationSid: String,
       workflowSid: String,
+      anyoneWorkflowSid: String,
+      someoneWorkflowSid: String,
       facebookPageId: String,
       voice: {
         recording: Boolean,
