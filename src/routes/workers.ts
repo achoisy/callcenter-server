@@ -188,6 +188,7 @@ router.post(
 
 router.post('/create-task-call/:phone', configuration, async (req, res) => {
   const { phone } = req.params;
+  const contact_uri = `client:${req.currentUser?.worker.friendlyName}`;
 
   if (!req.twilio) {
     throw new TaskRouterError('Missing twilio config setup...');
@@ -200,6 +201,7 @@ router.post('/create-task-call/:phone', configuration, async (req, res) => {
     name: phone,
     service: '',
     phone: phone,
+    contact_uri,
   };
 
   try {
