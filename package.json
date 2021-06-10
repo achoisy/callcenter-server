@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "prod": "ts-node dist/index.js",
+    "prod": "ts-node-dev dist/index.js",
     "build": "tsc -p ."
   },
   "author": "",

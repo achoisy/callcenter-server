@@ -36,21 +36,21 @@ const start = async () => {
 
   if (env.NODE_ENV == 'production') {
     const httpServer = http.createServer(app);
-    const httpsServer = https.createServer(
+    /* const httpsServer = https.createServer(
       {
         key: fs.readFileSync(env.SSL_PRIVKEY_PEM),
         cert: fs.readFileSync(env.SSL_FULLCHAIN_PEM),
       },
       app
-    );
+    ); */
 
-    /*httpServer.listen(env.HTTP_PORT, () => {
+    httpServer.listen(env.HTTP_PORT, () => {
       console.log(`Production mode: Listening on port ${env.HTTP_PORT}`);
-    }); */
-
-    httpsServer.listen(env.HTTPS_PORT, () => {
-      console.log(`Production mode: Listening on port ${env.HTTPS_PORT}`);
     });
+
+    /* httpsServer.listen(env.HTTPS_PORT, () => {
+      console.log(`Production mode: Listening on port ${env.HTTPS_PORT}`);
+    }); */
   } else {
     app.listen(env.HTTP_PORT, () => {
       console.log(`Devloppement mode: Listening on port ${env.HTTP_PORT}`);
