@@ -49,13 +49,15 @@ export const currentUser = async (
       email: payload.email,
       admin: currentUser.admin,
       worker: {
-        workerSid: currentUser.worker?.workerSid,
-        friendlyName: currentUser.worker?.friendlyName,
-        attributes: JSON.parse(currentUser.worker?.attributes || ''),
+        workerSid: currentUser.worker?.workerSid || '',
+        friendlyName: currentUser.worker?.friendlyName || '',
+        attributes: JSON.parse(currentUser.worker?.attributes || '{}'),
       },
       token: token,
     };
-  } catch (err) {}
+  } catch (err) {
+    console.log('Error: ', err);
+  }
 
   next();
 };
