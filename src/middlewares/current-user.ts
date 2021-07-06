@@ -40,6 +40,8 @@ export const currentUser = async (
 
     const currentUser = await User.findOne({ _id: payload.id });
 
+    console.log(currentUser);
+
     if (!currentUser) {
       return next();
     }
