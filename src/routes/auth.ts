@@ -93,4 +93,16 @@ router.post(
   }
 );
 
+router.get('/users', requireAdmin, async (req, res) => {
+  User.find()
+    .then((userList) => {
+      res.send(
+        userList.map((user) => {
+          return user.toJSON();
+        })
+      );
+    })
+    .catch((err) => {});
+});
+
 export { router as authRouter };
