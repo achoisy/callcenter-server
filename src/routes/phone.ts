@@ -2,8 +2,10 @@ import express, { Request, Response } from 'express';
 import { Twilio } from '../services/twilio-helper';
 import { twiml } from 'twilio';
 import { body } from 'express-validator';
+import { taskrouterWrapper } from '../services/taskrouter-helper';
 import { validateRequest, configuration, xmlHeader } from '../middlewares/';
-import { PhoneRouterError, CustomError } from '../errors/';
+import { PhoneRouterError, TaskRouterError, CustomError } from '../errors/';
+import { TaskrouterAttributes, Channel, TaskChannel } from '../interfaces';
 
 const router = express.Router();
 
@@ -151,5 +153,40 @@ router.post(
     }
   }
 );
+
+router.post('/create-task-call/:phone', configuration, async (req, res) => {
+  const { phone } = req.params;
+  const contact_uri = `client:${req.currentUser?.worker.friendlyName}`;
+
+  if (!req.twilio) {
+    throw new TaskRouterError('Missing twilio config setup...');
+  }
+
+  const attributes: TaskrouterAttributes = {
+    title: 'Appel sortant',
+    text: `Appel du numero: ${phone}`,
+    channel: Channel.call,
+    name: phone,
+    service: '',
+    phone: phone,
+    contact_uri,
+  };
+
+  try {
+    const newTask = await taskrouterWrapper.createTask({
+      attributes,
+      worflowSid: req.twilio.setup.someoneWorkflowSid,
+      timeout: 3600,
+      taskChannel: TaskChannel.voice,
+    });
+
+    res.status(200).send(newTask);
+  } catch (error) {
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new TaskRouterError(`Failed to create task call: ${error}`);
+  }
+});
 
 export { router as phoneRouter };

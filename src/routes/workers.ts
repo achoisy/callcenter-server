@@ -140,7 +140,7 @@ router.post(
       };
       await user.save();
 
-      res.status(200).send();
+      res.status(200).send(user.toJSON());
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
@@ -186,6 +186,7 @@ router.post(
   }
 );
 
+// TODO: This api has moved in /phone/
 router.post('/create-task-call/:phone', configuration, async (req, res) => {
   const { phone } = req.params;
   const contact_uri = `client:${req.currentUser?.worker.friendlyName}`;
