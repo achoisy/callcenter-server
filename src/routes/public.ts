@@ -75,7 +75,44 @@ router.post(
   (req: Request, res: Response) => {
     const { form } = req.body;
 
-    console.log('form', form);
+    if (!req.twilio) {
+      throw new Error('missing twilio configuration');
+    }
+
+    const opening = businessTime.checkOpening();
+
+    const attributes: TaskrouterAttributes = {
+      title: 'Demande de rappel URGENT',
+      text: 'Demande de rappel urgent fait par internet',
+      channel: Channel.callback,
+      name: form.nom,
+      service: 'URGENCE',
+      phone: form.int_tel,
+      metadata: form,
+    };
+
+    if (opening.isOpen) {
+      agendaWrapper.now(JobNames.rappelClientWeb, {
+        attributes,
+        worflowSid: req.twilio.setup.workflowSid,
+        timeout: 3600, // TODO: add timer to twilio setup or else
+        taskChannel: TaskChannel.voice,
+      });
+    } else {
+      // TODO: Definir la procedure hors heure d'ouverture pour les urgences
+      console.log(opening.nextOpeningTimeLocal);
+      agendaWrapper.schedule(
+        opening.nextOpeningTime!,
+        JobNames.rappelClientWeb,
+        {
+          attributes,
+          worflowSid: req.twilio.setup.workflowSid,
+          timeout: 3600, // TODO: add timer to twilio setup or else
+          taskChannel: TaskChannel.voice,
+        }
+      );
+    }
+
     res.status(200).send();
 
     Twilio.sendSms(
