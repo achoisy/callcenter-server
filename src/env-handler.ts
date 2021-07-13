@@ -16,6 +16,7 @@ export const schema = {
 
   // Mongodb
   MONGODB_URL: String,
+  AGENDADB_URL: String,
 
   // Ports
   HTTP_PORT: Number,
@@ -35,9 +36,14 @@ export const schema = {
   TWILIO_WORKER_TOKEN_LIFETIME: Number,
   TWILIO_TASKROUTER_URL: String,
   TWILIO_TASKROUTER_VERSION: String,
+  TWILIO_PHONE_NUMBER: String,
 
   //JWT secret key
   JWT_KEY: String,
+
+  // Recaptcha verification Url
+  CAPTCHA_URL: String,
+  CAPTCHA_KEY: String,
 };
 
 export let env: Env;

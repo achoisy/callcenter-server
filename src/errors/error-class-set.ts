@@ -59,3 +59,18 @@ export class PhoneRouterError extends CustomError {
     return [{ message: `Twilio Phone error: ${this.message}` }];
   }
 }
+
+export class ReCaptchaError extends CustomError {
+  statusCode = 401;
+
+  constructor() {
+    super('Invalid ReCaptcha');
+
+    // Only because extending a built in class
+    Object.setPrototypeOf(this, ReCaptchaError.prototype);
+  }
+
+  serializeErrors() {
+    return [{ message: 'Recaptcha error' }];
+  }
+}

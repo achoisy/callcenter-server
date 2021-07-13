@@ -6,13 +6,20 @@ import cors from 'cors';
 import 'express-async-errors';
 // import cookieSession from 'cookie-session';
 import { json, urlencoded } from 'body-parser';
-import { authRouter, ivrRouter, workersRouter, phoneRouter } from './routes/';
+import {
+  authRouter,
+  ivrRouter,
+  workersRouter,
+  phoneRouter,
+  publicRouter,
+} from './routes/';
 import {
   errorHandler,
   currentUser,
   configuration,
   requireAuth,
   xmlHeader,
+  reCaptchaCheck,
 } from './middlewares/';
 import { NotFoundError } from './errors/';
 
@@ -38,6 +45,8 @@ app.use(
 
 // Add id and email of current user if any to req.currentUser
 app.use(currentUser);
+
+app.use('/public', reCaptchaCheck, publicRouter);
 
 app.use('/auth', authRouter);
 

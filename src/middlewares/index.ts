@@ -5,3 +5,4 @@ export * from './require-auth';
 export * from './require-admin';
 export * from './configuration';
 export * from './xml-header';
+export * from './require-recaptcha';

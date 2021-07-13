@@ -2,24 +2,45 @@ import { loadEnv, env } from './env-handler';
 import mongoose from 'mongoose';
 import { Config } from './models/config';
 import http from 'http';
-import https from 'https';
-import fs from 'fs';
-
+/* import https from 'https';
+import fs from 'fs'; */
 // Loading env variables
 // Load before importing app
 loadEnv();
 
 import { app } from './app';
 import { taskrouterWrapper } from './services/taskrouter-helper';
+import moment from 'moment';
+import { businessTime } from './services/business-time';
+import { agendaWrapper } from './services/agenda';
+
+moment.locale('fr');
 
 const start = async () => {
   try {
-    await mongoose.connect('mongodb://localhost:27017/callcenter', {
+    // Config businessTime
+    businessTime.config({
+      workinghours: {
+        0: null,
+        1: ['09:30:00', '17:00:00'],
+        2: ['09:30:00', '17:00:00'],
+        3: ['09:30:00', '13:00:00'],
+        4: ['09:30:00', '12:00:00', '13:00:00', '17:00:00'],
+        5: ['09:30:00', '17:00:00'],
+        6: null,
+      },
+    });
+
+    await mongoose.connect(env.MONGODB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
     });
     console.log('Conected to mongodb !');
+
+    // Connection Agenda to mongodb
+    await agendaWrapper.connect(env.AGENDADB_URL);
+    console.log('Agenda started !');
 
     // Setting up twilio config ----
     const config = await Config.findOne({ default: true });
@@ -60,6 +81,7 @@ const start = async () => {
   // Gracefull shutdown function
   const stop = async () => {
     console.log('Trying graceful shutdown!');
+    await agendaWrapper.disconnect();
     await mongoose.disconnect();
     setTimeout(process.exit(0), 2000);
   };

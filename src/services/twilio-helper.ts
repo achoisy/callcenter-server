@@ -170,4 +170,24 @@ export class Twilio {
       }
     });
   }
+
+  static sendSms(to: string, from: string, body: string) {
+    return new Promise((resolve, reject) => {
+      try {
+        twilioClient.messages
+          .create({
+            to,
+            from,
+            body,
+          })
+          .then((message) => {
+            resolve(message);
+          });
+      } catch (error) {
+        throw new TwilioClientError(
+          `Unable to send sms to:${to} from:${from} body:${body} error:${error}`
+        );
+      }
+    });
+  }
 }
