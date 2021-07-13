@@ -36,7 +36,7 @@ router.post(
       {
         endConferenceOnExit: true,
         statusCallbackEvent: ['join'],
-        statusCallback: `/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
+        statusCallback: `/api/phone/conference/${CallSid}/add-participant/${encodeURIComponent(
           phone
         )}?token=${token}&reservation=${reservation}`,
       },
