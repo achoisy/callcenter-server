@@ -46,15 +46,15 @@ app.use(
 // Add id and email of current user if any to req.currentUser
 app.use(currentUser);
 
-app.use('/public', reCaptchaCheck, publicRouter);
+app.use('/api/public', reCaptchaCheck, publicRouter);
 
-app.use('/auth', authRouter);
+app.use('/api/auth', authRouter);
 
-app.use('/workers', requireAuth, workersRouter);
+app.use('/api/workers', requireAuth, workersRouter);
 
-app.use('/phone', requireAuth, phoneRouter);
+app.use('/api/phone', requireAuth, phoneRouter);
 
-app.use('/ivr', xmlHeader, configuration, ivrRouter);
+app.use('/api/ivr', xmlHeader, configuration, ivrRouter);
 
 // Not Found route
 app.all('*', async (req, res) => {
