@@ -12,6 +12,7 @@ import {
   workersRouter,
   phoneRouter,
   publicRouter,
+  callRouter,
 } from './routes/';
 import {
   errorHandler,
@@ -55,6 +56,8 @@ app.use('/api/workers', requireAuth, workersRouter);
 app.use('/api/phone', requireAuth, phoneRouter);
 
 app.use('/api/ivr', xmlHeader, configuration, ivrRouter);
+
+app.use('/api/call', requireAuth, callRouter);
 
 // Not Found route
 app.all('*', async (req, res) => {

@@ -47,3 +47,5 @@ router.post('/incoming', xmlHeader, async (req, res) => {
     throw new DatabaseConnectionError('Could not add new call');
   }
 });
+
+export { router as callRouter };
