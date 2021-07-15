@@ -24,6 +24,8 @@ interface CallDoc extends mongoose.Document {
   To: string;
   From: string;
   CallDuration: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Interface that describe propoties a user model have
@@ -31,38 +33,41 @@ interface CallModel extends mongoose.Model<CallDoc> {
   build(attrs: CallAttrs): CallDoc;
 }
 
-const callSchema = new mongoose.Schema({
-  CallSid: {
-    type: String,
+const callSchema = new mongoose.Schema(
+  {
+    CallSid: {
+      type: String,
+    },
+    ConfSid: {
+      type: String,
+    },
+    AccountSid: {
+      type: String,
+    },
+    CallerCountry: {
+      type: String,
+    },
+    Direction: {
+      type: String,
+    },
+    CallbackSource: {
+      type: String,
+    },
+    CallStatus: {
+      type: String,
+    },
+    To: {
+      type: String,
+    },
+    From: {
+      type: String,
+    },
+    CallDuration: {
+      type: Number,
+    },
   },
-  ConfSid: {
-    type: String,
-  },
-  AccountSid: {
-    type: String,
-  },
-  CallerCountry: {
-    type: String,
-  },
-  Direction: {
-    type: String,
-  },
-  CallbackSource: {
-    type: String,
-  },
-  CallStatus: {
-    type: String,
-  },
-  To: {
-    type: String,
-  },
-  From: {
-    type: String,
-  },
-  CallDuration: {
-    type: Number,
-  },
-});
+  { timestamps: true }
+);
 
 // Only for typescript to work properly
 callSchema.statics.build = (attrs: CallAttrs) => {

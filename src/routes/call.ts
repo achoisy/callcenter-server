@@ -10,7 +10,7 @@ import { Call } from '../models/call';
 const router = express.Router();
 
 // Log incoming call webhook
-router.post('/incoming', xmlHeader, async (req, res) => {
+router.post('/', xmlHeader, async (req, res) => {
   try {
     const {
       CallSid,
@@ -38,18 +38,13 @@ router.post('/incoming', xmlHeader, async (req, res) => {
     });
 
     await call.save();
-    res.status(201).send(call);
+    res.status(201).send('OK');
   } catch (error) {
     if (error instanceof CustomError) {
       throw error;
     }
     throw new DatabaseConnectionError('Could not add new call');
   }
-});
-
-router.post('/outbound', xmlHeader, async (req, res) => {
-  console.log(req.body);
-  res.status(200).send('OK');
 });
 
 export { router as callRouter };
