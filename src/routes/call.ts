@@ -11,7 +11,6 @@ const router = express.Router();
 
 // Log incoming call webhook
 router.post('/incoming', xmlHeader, async (req, res) => {
-  console.log(req.body);
   try {
     const {
       CallSid,
@@ -46,6 +45,11 @@ router.post('/incoming', xmlHeader, async (req, res) => {
     }
     throw new DatabaseConnectionError('Could not add new call');
   }
+});
+
+router.post('/outbound', xmlHeader, async (req, res) => {
+  console.log(req.body);
+  res.send('OK');
 });
 
 export { router as callRouter };

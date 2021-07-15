@@ -38,6 +38,9 @@ export const schema = {
   TWILIO_TASKROUTER_VERSION: String,
   TWILIO_PHONE_NUMBER: String,
 
+  // TWILIO JWT token for server auth
+  TWILIO_JWT_TOKEN: String,
+
   //JWT secret key
   JWT_KEY: String,
 

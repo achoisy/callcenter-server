@@ -138,6 +138,7 @@ export class Twilio {
             from: callerId,
             earlyMedia: true,
             endConferenceOnExit: true,
+            statusCallback: `/api/call/outbound?token=${env.TWILIO_JWT_TOKEN}`,
           })
           .then((participant) => {
             resolve(participant);
