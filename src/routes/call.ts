@@ -1,10 +1,6 @@
 import express, { Request, Response } from 'express';
-import { validateRequest, configuration, xmlHeader } from '../middlewares/';
-import {
-  BadRequestError,
-  CustomError,
-  DatabaseConnectionError,
-} from '../errors/';
+import { xmlHeader, mongooseQueryParser } from '../middlewares/';
+import { CustomError, DatabaseConnectionError } from '../errors/';
 import { Call } from '../models/call';
 
 const router = express.Router();
@@ -44,6 +40,16 @@ router.post('/', xmlHeader, async (req, res) => {
       throw error;
     }
     throw new DatabaseConnectionError('Could not add new call');
+  }
+});
+
+router.get('/', mongooseQueryParser, async (req, res) => {
+  try {
+    const calls = await Call.query(req.mongoQuery!);
+    res.status(200).send(calls);
+  } catch (error) {
+    //TODO: Create error handler
+    console.log(error);
   }
 });
 

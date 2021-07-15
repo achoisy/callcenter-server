@@ -80,7 +80,7 @@ router.post(
             reservation,
             { reservationStatus: 'accepted' }
           );
-          res.status(200).end();
+          return res.status(200).end();
         });
       } catch (error) {
         if (error instanceof CustomError) {
@@ -88,11 +88,8 @@ router.post(
         }
         throw new Error(error);
       }
-    } else {
-      // Add new entry in outbound call database
-      console.log(req.body);
-      res.status(200).end();
     }
+    return res.status(200).end();
   }
 );
 
