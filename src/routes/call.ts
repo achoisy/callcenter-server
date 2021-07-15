@@ -49,7 +49,7 @@ router.post('/incoming', xmlHeader, async (req, res) => {
 
 router.post('/outbound', xmlHeader, async (req, res) => {
   console.log(req.body);
-  res.send('OK');
+  res.status(200).send('OK');
 });
 
 export { router as callRouter };
