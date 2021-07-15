@@ -91,7 +91,7 @@ router.post(
           { reservationStatus: 'accepted' }
         );
       }
-      res.status(200).end;
+      res.status(200).end();
     }
   }
 );
