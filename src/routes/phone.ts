@@ -74,6 +74,12 @@ router.post(
           req.twilio.setup.callerId,
           phone
         ).then((participant) => {
+          //  Calling client. Accept reservation for initial worker
+          Twilio.reservationUpdate(
+            req.currentUser?.worker.workerSid!,
+            reservation,
+            { reservationStatus: 'accepted' }
+          );
           res.status(200).end();
         });
       } catch (error) {
@@ -83,14 +89,8 @@ router.post(
         throw new Error(error);
       }
     } else {
-      // User as join the call. Accept reservation for initial worker
-      if (reservation) {
-        Twilio.reservationUpdate(
-          req.currentUser?.worker.workerSid!,
-          reservation,
-          { reservationStatus: 'accepted' }
-        );
-      }
+      // Add new entry in outbound call database
+      console.log(req.body);
       res.status(200).end();
     }
   }
