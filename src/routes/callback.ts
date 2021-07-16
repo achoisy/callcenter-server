@@ -14,6 +14,7 @@ router.post('/', async (req, res) => {
     callbackDate,
     comment,
     phone,
+    name,
     contact_uri = '',
     workflowSid,
   } = req.body;
@@ -27,8 +28,8 @@ router.post('/', async (req, res) => {
       req.currentUser.worker.friendlyName || req.currentUser.email
     }`,
     channel: Channel.callback,
-    phone: '',
-    name: '',
+    phone,
+    name: name || phone,
     service: '',
     contact_uri,
     metadata: comment,

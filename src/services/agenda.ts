@@ -21,9 +21,6 @@ class AgendaWrapper {
     try {
       this._agenda = new Agenda({ db: { address: mongoConnectionString } });
 
-      // Define jobs
-      this.defineJobs();
-
       //Start agenda
       return this._agenda.start();
     } catch (error) {
@@ -31,31 +28,11 @@ class AgendaWrapper {
     }
   }
 
-  private defineJobs() {
-    // Rappel Client WEB
-    this.agenda.define(JobNames.rappelClientWeb, async (task: any) => {
-      const { attributes, workflowSid, taskChannel } = task.attrs.data;
-      await taskrouterWrapper.createTask({
-        attributes,
-        workflowSid,
-        taskChannel,
-      });
-    });
-  }
-
-  schedule(when: Date | string, jobName: JobNames, data: any) {
-    this.agenda.schedule(when, jobName, data);
-  }
-
   scheduleTask(when: Date | string, jobId: string, data: TaskAttrs) {
     this.agenda.define(jobId, async () => {
       await taskrouterWrapper.createTask(data);
     });
     this.agenda.schedule(when, jobId, data);
-  }
-
-  now(jobName: JobNames, data: any) {
-    this.agenda.now(jobName, data);
   }
 
   nowTask(jobId: string, data: TaskAttrs) {
