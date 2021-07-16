@@ -13,6 +13,9 @@ import {
   phoneRouter,
   publicRouter,
   callRouter,
+  callbackRouter,
+  clientRouter,
+  meetingRouter,
 } from './routes/';
 import {
   errorHandler,
@@ -58,6 +61,12 @@ app.use('/api/phone', requireAuth, phoneRouter);
 app.use('/api/ivr', xmlHeader, configuration, ivrRouter);
 
 app.use('/api/call', requireAuth, callRouter);
+
+app.use('/api/callback', requireAuth, callbackRouter);
+
+app.use('/api/client', requireAuth, clientRouter);
+
+app.use('/api/meeting', requireAuth, meetingRouter);
 
 // Not Found route
 app.all('*', async (req, res) => {

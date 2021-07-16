@@ -17,6 +17,7 @@ interface CallAttrs {
 
 interface CallDoc extends mongoose.Document {
   CallSid: string;
+  ConfSid?: string;
   AccountSid: string;
   CallerCountry: string;
   Direction: string;
@@ -70,12 +71,6 @@ const callSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJSON: {
-      transform(doc, ret) {
-        delete ret._id;
-      },
-      versionKey: false,
-    },
   }
 );
 
@@ -84,8 +79,8 @@ callSchema.statics.build = (attrs: CallAttrs) => {
   return new Call(attrs);
 };
 
-callSchema.statics.query = (queryOptions: QueryOptions) => {
-  let chain = Call.find(queryOptions.filter || {});
+callSchema.statics.query = function (queryOptions: QueryOptions) {
+  let chain = this.find(queryOptions.filter || {});
   if (queryOptions.populate) {
     chain = chain.populate(queryOptions.populate);
   }
@@ -101,7 +96,6 @@ callSchema.statics.query = (queryOptions: QueryOptions) => {
   if (queryOptions.select) {
     chain = chain.select(queryOptions.select);
   }
-
   return chain.exec();
 };
 

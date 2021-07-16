@@ -43,6 +43,7 @@ router.post('/', xmlHeader, async (req, res) => {
   }
 });
 
+// Get calls buy query string
 router.get('/', mongooseQueryParser, async (req, res) => {
   try {
     const calls = await Call.query(req.mongoQuery!);

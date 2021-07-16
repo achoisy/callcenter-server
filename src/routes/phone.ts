@@ -172,8 +172,7 @@ router.post('/create-task-call/:phone', configuration, async (req, res) => {
   try {
     const newTask = await taskrouterWrapper.createTask({
       attributes,
-      worflowSid: req.twilio.setup.someoneWorkflowSid,
-      timeout: 3600,
+      workflowSid: req.twilio.setup.someoneWorkflowSid,
       taskChannel: TaskChannel.voice,
     });
 

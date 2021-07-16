@@ -4,3 +4,6 @@ export * from './workers';
 export * from './phone';
 export * from './public';
 export * from './call';
+export * from './callback';
+export * from './client';
+export * from './meeting';

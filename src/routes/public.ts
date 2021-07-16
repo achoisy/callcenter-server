@@ -41,8 +41,7 @@ router.post(
     if (opening.isOpen) {
       agendaWrapper.now(JobNames.rappelClientWeb, {
         attributes,
-        worflowSid: req.twilio.setup.workflowSid,
-        timeout: 3600, // TODO: add timer to twilio setup or else
+        workflowSid: req.twilio.setup.workflowSid,
         taskChannel: TaskChannel.voice,
       });
     } else {
@@ -52,8 +51,7 @@ router.post(
         JobNames.rappelClientWeb,
         {
           attributes,
-          worflowSid: req.twilio.setup.workflowSid,
-          timeout: 3600, // TODO: add timer to twilio setup or else
+          workflowSid: req.twilio.setup.workflowSid,
           taskChannel: TaskChannel.voice,
         }
       );
@@ -94,8 +92,7 @@ router.post(
     if (opening.isOpen) {
       agendaWrapper.now(JobNames.rappelClientWeb, {
         attributes,
-        worflowSid: req.twilio.setup.workflowSid,
-        timeout: 3600, // TODO: add timer to twilio setup or else
+        workflowSid: req.twilio.setup.workflowSid,
         taskChannel: TaskChannel.voice,
       });
     } else {
@@ -106,8 +103,7 @@ router.post(
         JobNames.rappelClientWeb,
         {
           attributes,
-          worflowSid: req.twilio.setup.workflowSid,
-          timeout: 3600, // TODO: add timer to twilio setup or else
+          workflowSid: req.twilio.setup.workflowSid,
           taskChannel: TaskChannel.voice,
         }
       );

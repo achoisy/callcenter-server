@@ -111,7 +111,7 @@ router.get(
       .enqueue({
         workflowSid: taskrouterWrapper.twilioSetup.workflowSid,
       })
-      .task({ priority: 1, timeout: 3600 }, JSON.stringify(attributes));
+      .task({ priority: 1 }, JSON.stringify(attributes));
 
     res.send(twimlVoice.toString());
   }
@@ -156,8 +156,7 @@ router.get('/create-task', async (req, res) => {
   try {
     await taskrouterWrapper.createTask({
       attributes,
-      worflowSid: req.twilio.setup.workflowSid,
-      timeout: 720, // TODO: add timer to twilio setup or else
+      workflowSid: req.twilio.setup.workflowSid,
       taskChannel: TaskChannel.voice,
     });
     twimlVoice.say(

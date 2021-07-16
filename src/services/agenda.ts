@@ -1,13 +1,11 @@
 import { Agenda, Job } from 'agenda';
 import { taskrouterWrapper } from './taskrouter-helper';
-import { TaskrouterAttributes, TaskChannel, JobNames } from '../interfaces';
-
-interface Overrides {
-  attributes: TaskrouterAttributes;
-  worflowSid: string;
-  timeout: number;
-  taskChannel: TaskChannel;
-}
+import {
+  TaskrouterAttributes,
+  TaskChannel,
+  JobNames,
+  TaskAttrs,
+} from '../interfaces';
 
 class AgendaWrapper {
   private _agenda?: Agenda;
@@ -36,11 +34,10 @@ class AgendaWrapper {
   private defineJobs() {
     // Rappel Client WEB
     this.agenda.define(JobNames.rappelClientWeb, async (task: any) => {
-      const { attributes, worflowSid, timeout, taskChannel } = task.attrs.data;
+      const { attributes, workflowSid, taskChannel } = task.attrs.data;
       await taskrouterWrapper.createTask({
         attributes,
-        worflowSid,
-        timeout,
+        workflowSid,
         taskChannel,
       });
     });
@@ -50,8 +47,26 @@ class AgendaWrapper {
     this.agenda.schedule(when, jobName, data);
   }
 
+  scheduleTask(when: Date | string, jobId: string, data: TaskAttrs) {
+    this.agenda.define(jobId, async () => {
+      await taskrouterWrapper.createTask(data);
+    });
+    this.agenda.schedule(when, jobId, data);
+  }
+
   now(jobName: JobNames, data: any) {
     this.agenda.now(jobName, data);
+  }
+
+  nowTask(jobId: string, data: TaskAttrs) {
+    this.agenda.define(jobId, async () => {
+      await taskrouterWrapper.createTask(data);
+    });
+    this.agenda.now(jobId, data);
+  }
+
+  cancel(jobId: string): Promise<number | undefined> {
+    return this.agenda.cancel({ name: jobId });
   }
 
   disconnect() {

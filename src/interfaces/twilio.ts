@@ -96,3 +96,9 @@ export interface ConferenceParticipant {
   callSid: string;
   label: string;
 }
+
+export interface TaskAttrs {
+  attributes: TaskrouterAttributes;
+  workflowSid: string;
+  taskChannel: TaskChannel;
+}

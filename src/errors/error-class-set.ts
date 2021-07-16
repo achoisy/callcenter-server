@@ -74,3 +74,48 @@ export class ReCaptchaError extends CustomError {
     return [{ message: 'Recaptcha error' }];
   }
 }
+
+export class CallbackError extends CustomError {
+  statusCode = 400;
+
+  constructor() {
+    super('Callback error');
+
+    // Only because extending a built in class
+    Object.setPrototypeOf(this, CallbackError.prototype);
+  }
+
+  serializeErrors() {
+    return [{ message: 'Callbback error' }];
+  }
+}
+
+export class ClientError extends CustomError {
+  statusCode = 400;
+
+  constructor() {
+    super('Callback error');
+
+    // Only because extending a built in class
+    Object.setPrototypeOf(this, ClientError.prototype);
+  }
+
+  serializeErrors() {
+    return [{ message: 'Client error' }];
+  }
+}
+
+export class MeetingError extends CustomError {
+  statusCode = 400;
+
+  constructor() {
+    super('Meeting error');
+
+    // Only because extending a built in class
+    Object.setPrototypeOf(this, MeetingError.prototype);
+  }
+
+  serializeErrors() {
+    return [{ message: 'Meeting error' }];
+  }
+}

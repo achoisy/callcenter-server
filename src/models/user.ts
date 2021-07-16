@@ -3,7 +3,7 @@ import { Password } from '../services/password';
 import { Channel, Service } from '../interfaces';
 
 // An interface that describe proproties neded to create a new user
-interface UserAttrs {
+export interface UserAttrs {
   email: string;
   password: string;
   admin?: boolean;
@@ -20,7 +20,7 @@ interface UserModel extends mongoose.Model<UserDoc> {
 }
 
 // An interface that describe the propreties that a user have
-interface UserDoc extends mongoose.Document {
+export interface UserDoc extends mongoose.Document {
   email: string;
   password: string;
   admin: boolean;

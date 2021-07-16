@@ -9,6 +9,7 @@ import {
   Service,
   WorkerAttrs,
   WorkspacePolicyOptions,
+  TaskAttrs,
 } from '../interfaces';
 import { TaskRouterError, CustomError } from '../errors/';
 import { WorkerInstance } from 'twilio/lib/rest/taskrouter/v1/workspace/worker';
@@ -70,22 +71,11 @@ class Taskrouter {
   }
 
   // Create a new task in twilio taskrouter for specified callcenter
-  async createTask({
-    attributes,
-    worflowSid,
-    timeout,
-    taskChannel,
-  }: {
-    attributes: TaskrouterAttributes;
-    worflowSid: string;
-    timeout: number;
-    taskChannel: TaskChannel;
-  }) {
+  async createTask({ attributes, workflowSid, taskChannel }: TaskAttrs) {
     try {
       const payload = {
-        workflowSid: worflowSid,
+        workflowSid: workflowSid,
         attributes: JSON.stringify(attributes),
-        timeout: timeout,
         taskChannel: taskChannel,
       };
       const newTask = await twilioClient.taskrouter
@@ -178,10 +168,11 @@ class Taskrouter {
     });
 
     // Event Bridge Policies
-    const eventBridgePolicies = twilio.jwt.taskrouter.util.defaultEventBridgePolicies(
-      env.TWILIO_ACCOUNT_SID,
-      workerSid
-    );
+    const eventBridgePolicies =
+      twilio.jwt.taskrouter.util.defaultEventBridgePolicies(
+        env.TWILIO_ACCOUNT_SID,
+        workerSid
+      );
 
     // Worker Policies
     const workerPolicies = twilio.jwt.taskrouter.util.defaultWorkerPolicies(
