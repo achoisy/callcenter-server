@@ -184,6 +184,9 @@ export class Twilio {
           .then((message) => {
             console.log('msg send');
             resolve(message);
+          })
+          .catch((error) => {
+            console.log(error);
           });
       } catch (error) {
         console.log(error);
