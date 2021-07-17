@@ -182,9 +182,11 @@ export class Twilio {
             body,
           })
           .then((message) => {
+            console.log('msg send');
             resolve(message);
           });
       } catch (error) {
+        console.log(error);
         throw new TwilioClientError(
           `Unable to send sms to:${to} from:${from} body:${body} error:${error}`
         );

@@ -66,13 +66,13 @@ router.post(
           taskAttrs
         );
       }
-
-      res.status(200).send();
+      console.log('sms to ');
       Twilio.sendSms(
         form.int_tel,
         env.TWILIO_PHONE_NUMBER,
         'Votre demande de rappel a bien été pris en compte. Le service client, HomeSecours.fr'
       );
+      res.status(200).send();
     } catch (error) {
       console.error(error);
       if (error instanceof CustomError) {
