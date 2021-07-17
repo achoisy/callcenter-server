@@ -5,7 +5,7 @@ import { UserDoc } from './user';
 
 export interface CallbackAttrs {
   phone: string;
-  creator: Types.ObjectId | Record<string, unknown>;
+  creator?: Types.ObjectId | Record<string, unknown>;
   callbackDate: Date;
   comment: string;
   taskChannel: TaskChannel;
@@ -20,7 +20,7 @@ interface CallbackBaseDoc extends CallbackAttrs, Document {
 }
 
 export interface CallbackDoc extends CallbackBaseDoc {
-  creator: UserDoc['_id'];
+  creator?: UserDoc['_id'];
 }
 
 export interface CallbackPopulatedDoc extends CallbackBaseDoc {
@@ -51,7 +51,6 @@ const callbackSchema = new Schema<CallbackDoc, CallbackModel>(
     creator: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      require: true,
     },
     deleted: {
       type: Boolean,

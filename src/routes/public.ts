@@ -52,7 +52,6 @@ router.post(
         phone: form.int_tel,
         callbackDate: new Date(),
         comment: JSON.stringify(form),
-        creator: Types.ObjectId(req.currentUser!.id),
         taskChannel: TaskChannel.voice,
         attributes,
       });
@@ -118,7 +117,6 @@ router.post(
         phone: form.int_tel,
         callbackDate: new Date(),
         comment: JSON.stringify(form),
-        creator: Types.ObjectId(req.currentUser!.id),
         taskChannel: TaskChannel.voice,
         attributes,
       });
