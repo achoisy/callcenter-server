@@ -87,6 +87,7 @@ router.post(
   '/urgence',
   [body('form').notEmpty().withMessage('form is required')],
   validateRequest,
+  configuration,
   async (req: Request, res: Response) => {
     const { form } = req.body;
 
