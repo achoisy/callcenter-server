@@ -127,7 +127,8 @@ export class Twilio {
   static addParticipantToConference(
     conferenceSid: string,
     callerId: string,
-    phone: string
+    phone: string,
+    label?: string
   ): Promise<ParticipantInstance> {
     return new Promise((resolve, reject) => {
       try {
@@ -139,6 +140,7 @@ export class Twilio {
             earlyMedia: true,
             endConferenceOnExit: true,
             statusCallback: `${env.PROD_BASE_URL}/api/call?token=${env.TWILIO_JWT_TOKEN}`,
+            label: label || '',
           })
           .then((participant) => {
             resolve(participant);

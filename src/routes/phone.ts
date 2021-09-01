@@ -72,7 +72,8 @@ router.post(
         Twilio.addParticipantToConference(
           confsid,
           req.twilio.setup.callerId,
-          phone
+          phone,
+          'customer'
         ).then((participant) => {
           //  Calling client. Accept reservation for initial worker
           Twilio.reservationUpdate(
