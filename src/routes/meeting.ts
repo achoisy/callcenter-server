@@ -1,6 +1,6 @@
 import express from 'express';
 import { mongooseQueryParser } from '../middlewares/';
-import { MeetingError, CustomError } from '../errors';
+import { MeetingError, CustomError, DatabaseConnectionError } from '../errors';
 import { Meeting } from '../models/meeting';
 
 const router = express.Router();
@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new DatabaseConnectionError('Could not create new meeting');
   }
 });
 
@@ -31,7 +31,12 @@ router.get('/', mongooseQueryParser, async (req, res) => {
   try {
     const meeting = await Meeting.query(req.mongoQuery!);
     res.status(200).send(meeting);
-  } catch (error) {}
+  } catch (error) {
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new DatabaseConnectionError('Could not query meeting');
+  }
 });
 
 router.delete('/:meetingId', async (req, res) => {
@@ -52,7 +57,7 @@ router.delete('/:meetingId', async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new DatabaseConnectionError('Could not delete meeting');
   }
 });
 

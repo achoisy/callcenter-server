@@ -100,7 +100,9 @@ router.delete('/:workersid', requireAdmin, async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new DatabaseConnectionError(`Worker deletion: ${error}`);
+    throw new DatabaseConnectionError(
+      `Worker deletion: ${JSON.stringify(error)}`
+    );
   }
 });
 
@@ -146,7 +148,7 @@ router.post(
         throw error;
       }
       throw new DatabaseConnectionError(
-        `Faild to join worker with user: ${error}`
+        `Faild to join worker with user: ${JSON.stringify(error)}`
       );
     }
   }
@@ -217,7 +219,9 @@ router.post('/create-task-call/:phone', configuration, async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new TaskRouterError(`Failed to create task call: ${error}`);
+    throw new TaskRouterError(
+      `Failed to create task call: ${JSON.stringify(error)}`
+    );
   }
 });
 

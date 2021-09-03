@@ -4,7 +4,7 @@ import { Callback } from '../models/callback';
 import { mongooseQueryParser } from '../middlewares/';
 import { Channel, TaskChannel } from '../interfaces';
 import { agendaWrapper } from '../services/agenda';
-import { CallbackError, CustomError } from '../errors';
+import { CallbackError, CustomError, DatabaseConnectionError } from '../errors';
 
 const router = express.Router();
 
@@ -62,7 +62,7 @@ router.post('/', async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new DatabaseConnectionError('Could not create new callback');
   }
 });
 
@@ -75,7 +75,7 @@ router.get('/', mongooseQueryParser, async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new DatabaseConnectionError('Could not query callback');
   }
 });
 
@@ -101,7 +101,7 @@ router.delete('/:callbackId', async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new DatabaseConnectionError('Could not delete callback');
   }
 });
 

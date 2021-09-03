@@ -4,7 +4,7 @@ import { twiml } from 'twilio';
 import { body } from 'express-validator';
 import { taskrouterWrapper } from '../services/taskrouter-helper';
 import { validateRequest, configuration, xmlHeader } from '../middlewares/';
-import { PhoneRouterError, TaskRouterError, CustomError } from '../errors/';
+import { TwilioClientError, TaskRouterError, CustomError } from '../errors/';
 import { TaskrouterAttributes, Channel, TaskChannel } from '../interfaces';
 
 const router = express.Router();
@@ -87,7 +87,9 @@ router.post(
         if (error instanceof CustomError) {
           throw error;
         }
-        throw new Error(error);
+        throw new TwilioClientError(
+          'Could not add participant or update reservation'
+        );
       }
     }
     return res.status(200).end();
@@ -115,7 +117,7 @@ router.get('/conference/:confsid', (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new TwilioClientError('Could not get conference by Sid');
   }
 });
 
@@ -147,7 +149,7 @@ router.post(
       if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error(error);
+      throw new TwilioClientError('Could not put participant on hold');
     }
   }
 );

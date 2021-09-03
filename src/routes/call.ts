@@ -49,8 +49,11 @@ router.get('/', mongooseQueryParser, async (req, res) => {
     const calls = await Call.query(req.mongoQuery!);
     res.status(200).send(calls);
   } catch (error) {
-    //TODO: Create error handler
-    console.log(error);
+    console.error(error);
+    if (error instanceof CustomError) {
+      throw error;
+    }
+    throw new DatabaseConnectionError('Could not query call');
   }
 });
 

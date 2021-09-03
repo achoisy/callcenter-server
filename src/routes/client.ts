@@ -1,6 +1,6 @@
 import express from 'express';
 import { mongooseQueryParser } from '../middlewares/';
-import { ClientError, CustomError } from '../errors';
+import { ClientError, CustomError, DatabaseConnectionError } from '../errors';
 import { Client } from '../models/client';
 
 const router = express.Router();
@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new DatabaseConnectionError('Could not create new client');
   }
 });
 
@@ -49,7 +49,7 @@ router.get('/', mongooseQueryParser, async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new DatabaseConnectionError('Could not query client');
   }
 });
 
@@ -79,7 +79,7 @@ router.put('/:clientId', async (req, res) => {
     if (error instanceof CustomError) {
       throw error;
     }
-    throw new Error(error);
+    throw new DatabaseConnectionError('Could not update client');
   }
 });
 

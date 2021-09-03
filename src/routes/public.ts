@@ -78,7 +78,7 @@ router.post(
       if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error(error);
+      throw new Error();
     }
   }
 );
@@ -146,7 +146,7 @@ router.post(
       if (error instanceof CustomError) {
         throw error;
       }
-      throw new Error(error);
+      throw new Error();
     }
   }
 );
