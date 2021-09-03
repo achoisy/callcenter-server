@@ -1,55 +1,41 @@
-import mongoose from 'mongoose';
+import { Document, Model, model, Schema, Types, PopulatedDoc } from 'mongoose';
 import { QueryOptions } from 'mongoose-query-parser';
 
-interface ClientAttrs {
-  phone: string;
+export interface ClientDoc {
+  phone?: string;
   name?: string;
   company?: string;
   email?: string;
   address?: string;
+  comment?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-interface ClientDoc extends mongoose.Document {
-  phone: string;
-  name?: string;
-  company?: string;
-  email?: string;
-  address?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface ClientModel extends mongoose.Model<ClientDoc> {
-  build(attrs: ClientAttrs): ClientDoc;
+interface ClientModel extends Model<ClientDoc> {
   query(queryOptions: QueryOptions): Promise<ClientDoc[]>;
 }
 
-const clientSchema = new mongoose.Schema(
+const clientSchema = new Schema<ClientDoc, ClientModel>(
   {
-    phone: {
-      type: String,
-      unique: true,
-      required: true,
-    },
+    phone: { type: String },
     name: { type: String },
     company: { type: String },
     email: { type: String },
     address: { type: String },
+    comment: { type: String },
   },
   {
     timestamps: true,
     toJSON: {
       transform(doc, ret) {
+        ret.id = ret._id;
         delete ret._id;
       },
       versionKey: false,
     },
   }
 );
-
-clientSchema.statics.build = (attrs) => {
-  return new Client(attrs);
-};
 
 clientSchema.statics.query = (queryOptions: QueryOptions) => {
   let chain = Client.find(queryOptions.filter || {});
@@ -72,6 +58,6 @@ clientSchema.statics.query = (queryOptions: QueryOptions) => {
   return chain.exec();
 };
 
-const Client = mongoose.model<ClientDoc, ClientModel>('Client', clientSchema);
+const Client = model<ClientDoc, ClientModel>('Client', clientSchema);
 
 export { Client };

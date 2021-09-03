@@ -7,3 +7,4 @@ export * from './call';
 export * from './callback';
 export * from './client';
 export * from './meeting';
+export * from './contact';

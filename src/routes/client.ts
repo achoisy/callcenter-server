@@ -6,7 +6,13 @@ import { Client } from '../models/client';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const { phone, name, company, email, address } = req.body;
+  const {
+    phone = '',
+    name = '',
+    company = '',
+    email = '',
+    address = '',
+  } = req.body;
 
   try {
     // Check if Client already exist in database
@@ -15,7 +21,7 @@ router.post('/', async (req, res) => {
       throw new ClientError();
     }
     // Add new client
-    const client = Client.build({
+    const client = new Client({
       phone,
       name,
       company,
@@ -24,7 +30,7 @@ router.post('/', async (req, res) => {
     });
     await client.save();
 
-    res.send(client);
+    res.status(201).send(client);
   } catch (error) {
     console.error(error);
     if (error instanceof CustomError) {
@@ -36,8 +42,8 @@ router.post('/', async (req, res) => {
 
 router.get('/', mongooseQueryParser, async (req, res) => {
   try {
-    const client = await Client.query(req.mongoQuery!);
-    res.status(200).send(client);
+    const clients = await Client.query(req.mongoQuery!);
+    res.status(200).send(clients);
   } catch (error) {
     console.error(error);
     if (error instanceof CustomError) {
@@ -49,17 +55,25 @@ router.get('/', mongooseQueryParser, async (req, res) => {
 
 router.put('/:clientId', async (req, res) => {
   const { phone, name, company, email, address } = req.body;
+  const clientId = req.params.clientId;
 
   try {
     // Check if Client already exist in database
-    const client = await Client.findOne({ phone });
+    const client = await Client.findById(clientId);
+
     if (!client) {
       throw new ClientError();
     }
     // Update client
-    await client.updateOne({ phone, name, company, email, address });
+    const updateClient = await client.updateOne({
+      phone,
+      name,
+      company,
+      email,
+      address,
+    });
 
-    res.status(200).send(client);
+    res.status(200).send(updateClient);
   } catch (error) {
     console.error(error);
     if (error instanceof CustomError) {
