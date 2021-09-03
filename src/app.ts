@@ -16,6 +16,7 @@ import {
   callbackRouter,
   clientRouter,
   meetingRouter,
+  contactRouter,
 } from './routes/';
 import {
   errorHandler,
@@ -67,6 +68,8 @@ app.use('/api/callback', requireAuth, callbackRouter);
 app.use('/api/client', requireAuth, clientRouter);
 
 app.use('/api/meeting', requireAuth, meetingRouter);
+
+app.use('/api/contact', requireAuth, contactRouter);
 
 // Not Found route
 app.all('*', async (req, res) => {

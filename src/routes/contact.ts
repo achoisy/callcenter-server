@@ -43,3 +43,5 @@ router.get('/', mongooseQueryParser, async (req, res) => {
     throw new DatabaseConnectionError('Could not get contact query');
   }
 });
+
+export { router as contactRouter };
