@@ -154,6 +154,7 @@ router.get('/create-task', async (req, res) => {
   });
 
   const attributes: TaskrouterAttributes = {
+    clientId: client._id,
     title: 'Demande de rappel',
     text: `L'appelant a répondu au SVI avec l'option ${req.query.serviceFriendlyName}`,
     channel: Channel.callback,
