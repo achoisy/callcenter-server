@@ -7,7 +7,14 @@ const router = express.Router();
 
 // Create new contact
 router.post('/', async (req, res) => {
-  const { CallSid, client, taskChannel, channel, attributes } = req.body;
+  const {
+    contactSid,
+    client,
+    taskChannel,
+    channel,
+    attributes,
+    finalComment = '',
+  } = req.body;
 
   if (!req.currentUser) {
     throw new Error('No current user');
@@ -15,16 +22,19 @@ router.post('/', async (req, res) => {
 
   try {
     const contact = new Contact({
-      CallSid,
+      contactSid,
       client,
       taskChannel,
       channel,
       attributes,
+      finalComment,
+      creator: req.currentUser.id,
     });
 
     await contact.save();
     res.status(201).send(contact.toJSON());
   } catch (error) {
+    console.log(error);
     if (error instanceof CustomError) {
       throw error;
     }

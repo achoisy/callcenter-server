@@ -5,11 +5,12 @@ import { ClientDoc } from './client';
 import { UserDoc } from './user';
 
 export interface ContactDoc {
-  CallSid: string;
+  contactSid: string;
   client?: PopulatedDoc<ClientDoc & Document>;
   taskChannel: TaskChannel;
   channel: Channel;
   attributes: TaskrouterAttributes;
+  finalComment?: string;
   creator?: PopulatedDoc<UserDoc & Document>;
   createdAt?: Date;
   updatedAt?: Date;
