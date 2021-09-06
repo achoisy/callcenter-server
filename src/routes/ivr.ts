@@ -5,6 +5,7 @@ import { twiml } from 'twilio';
 import { TaskrouterAttributes, Channel, TaskChannel } from '../interfaces';
 import { taskrouterWrapper } from '../services/taskrouter-helper';
 import { CustomError } from '../errors';
+import { Client } from '../models/client';
 
 const router = express.Router();
 //TODO: add token security to ivr routes
@@ -45,7 +46,7 @@ router.get(
   '/select-service',
   query('Digits').notEmpty(),
   validateRequest,
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     const twimlVoice = new twiml.VoiceResponse();
 
     const IvrRequestError = (error: string) => {
@@ -97,12 +98,16 @@ router.get(
       return IvrRequestError(`From not of type string: ${req.query.From}`);
     }
 
+    const client = await Client.getClientByPhone({
+      phone: req.query.From,
+    });
     /* create task attributes */
     const attributes: TaskrouterAttributes = {
+      clientId: client._id,
       text: `L'appelant a répondu au SVI avec l'option ${service.friendlyName}`,
       channel: Channel.phone,
       phone: req.query.From,
-      name: req.query.From,
+      name: client.name || req.query.From,
       title: 'Appel entrant',
       service: service.friendlyName,
     };
@@ -144,11 +149,15 @@ router.get('/create-task', async (req, res) => {
     );
   }
 
+  const client = await Client.getClientByPhone({
+    phone: req.query.From,
+  });
+
   const attributes: TaskrouterAttributes = {
     title: 'Demande de rappel',
     text: `L'appelant a répondu au SVI avec l'option ${req.query.serviceFriendlyName}`,
     channel: Channel.callback,
-    name: req.query.From,
+    name: client.name || req.query.From,
     service: req.query.serviceFriendlyName,
     phone: req.query.From,
   };
