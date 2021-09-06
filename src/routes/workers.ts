@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { validateRequest, requireAdmin, configuration } from '../middlewares/';
 import { body } from 'express-validator';
 import { User } from '../models/user';
+import { Client } from '../models/client';
 import {
   BadRequestError,
   TaskRouterError,
@@ -197,11 +198,16 @@ router.post('/create-task-call/:phone', configuration, async (req, res) => {
     throw new TaskRouterError('Missing twilio config setup...');
   }
 
+  const client = await Client.getClientByPhone({
+    phone,
+  });
+
   const attributes: TaskrouterAttributes = {
+    clientId: client._id,
     title: 'Appel sortant',
     text: `Appel du numero: ${phone}`,
     channel: Channel.call,
-    name: phone,
+    name: client.name || phone,
     service: '',
     phone: phone,
     contact_uri,

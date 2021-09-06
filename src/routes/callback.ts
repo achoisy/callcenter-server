@@ -1,8 +1,9 @@
 import express from 'express';
 import { Types } from 'mongoose';
 import { Callback } from '../models/callback';
+import { Client } from '../models/client';
 import { mongooseQueryParser } from '../middlewares/';
-import { Channel, TaskChannel } from '../interfaces';
+import { Channel, TaskChannel, TaskrouterAttributes } from '../interfaces';
 import { agendaWrapper } from '../services/agenda';
 import { CallbackError, CustomError, DatabaseConnectionError } from '../errors';
 
@@ -22,14 +23,20 @@ router.post('/', async (req, res) => {
     throw new Error('No current user');
   }
 
-  const attributes = {
+  const client = await Client.getClientByPhone({
+    name,
+    phone,
+  });
+
+  const attributes: TaskrouterAttributes = {
+    clientId: client._id,
     title: 'Demande de rappel programmé',
     text: `Créé par: ${
       req.currentUser.worker.friendlyName || req.currentUser.email
     }`,
     channel: Channel.callback,
     phone,
-    name: name || phone,
+    name: client.name || name,
     service: '',
     contact_uri,
     metadata: comment,

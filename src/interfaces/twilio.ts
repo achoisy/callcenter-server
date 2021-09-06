@@ -70,6 +70,7 @@ export interface TaskrouterAttributes {
   service: string;
   contact_uri?: string;
   metadata?: any;
+  clientId?: string;
 }
 
 export interface WorkersAttributes {

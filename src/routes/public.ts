@@ -7,6 +7,7 @@ import { validateRequest, configuration } from '../middlewares/';
 import { businessTime } from '../services/business-time';
 import { agendaWrapper } from '../services/agenda';
 import { Callback } from '../models/callback';
+import { Client } from '../models/client';
 import { CustomError } from '../errors';
 import {
   JobNames,
@@ -31,11 +32,17 @@ router.post(
 
     const opening = businessTime.checkOpening();
 
+    const client = await Client.getClientByPhone({
+      name: form.nom,
+      phone: form.int_tel,
+    });
+
     const attributes: TaskrouterAttributes = {
+      clientId: client._id,
       title: 'Demande de rappel',
       text: 'Demande de devis fait par internet',
       channel: Channel.callback,
-      name: form.nom,
+      name: client.name || form.nom,
       service: form.service,
       phone: form.int_tel,
       metadata: JSON.stringify(form),
@@ -97,11 +104,17 @@ router.post(
 
     const opening = businessTime.checkOpening();
 
+    const client = await Client.getClientByPhone({
+      name: form.nom,
+      phone: form.int_tel,
+    });
+
     const attributes: TaskrouterAttributes = {
+      clientId: client._id,
       title: 'Demande de rappel URGENT',
       text: 'Demande de rappel urgent fait par internet',
       channel: Channel.callback,
-      name: form.nom,
+      name: client.name || form.nom,
       service: 'URGENCE',
       phone: form.int_tel,
       metadata: JSON.stringify(form),

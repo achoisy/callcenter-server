@@ -10,10 +10,12 @@ export interface ClientDoc {
   comment?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  _id?: string;
 }
 
 interface ClientModel extends Model<ClientDoc> {
   query(queryOptions: QueryOptions): Promise<ClientDoc[]>;
+  getClientByPhone(client: ClientDoc): Promise<ClientDoc>;
 }
 
 const clientSchema = new Schema<ClientDoc, ClientModel>(
@@ -56,6 +58,19 @@ clientSchema.statics.query = (queryOptions: QueryOptions) => {
   }
 
   return chain.exec();
+};
+
+clientSchema.statics.getClientByPhone = async (client: ClientDoc) => {
+  const clientResult = await Client.findOne({ phone: client.phone }).exec();
+
+  // Check if client with matching phone number exist
+  // If not create a new client and return created id
+  if (!clientResult) {
+    const newClient = new Client(client);
+    await newClient.save();
+    return newClient;
+  }
+  return clientResult;
 };
 
 const Client = model<ClientDoc, ClientModel>('Client', clientSchema);
