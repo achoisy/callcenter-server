@@ -28,6 +28,7 @@ router.post('/', async (req, res) => {
     phone,
   });
 
+  const commentObj = { comment: comment };
   const attributes: TaskrouterAttributes = {
     clientId: client._id,
     title: 'Demande de rappel programmé',
@@ -39,7 +40,7 @@ router.post('/', async (req, res) => {
     name: client.name || name,
     service: '',
     contact_uri,
-    metadata: JSON.stringify({ comment }),
+    metadata: JSON.stringify(commentObj),
   };
 
   const taskAttrs = {
