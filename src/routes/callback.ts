@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
     name: client.name || name,
     service: '',
     contact_uri,
-    metadata: `"comment": "${comment}"`,
+    metadata: JSON.stringify({ comment }),
   };
 
   const taskAttrs = {
