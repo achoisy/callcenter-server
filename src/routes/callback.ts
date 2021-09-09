@@ -31,15 +31,15 @@ router.post('/', async (req, res) => {
   const attributes: TaskrouterAttributes = {
     clientId: client._id,
     title: 'Demande de rappel programmé',
-    text: `Commentaire: ${comment || 'neant'}. Créé par: ${
+    text: `${comment || ''} - Créé par: ${
       req.currentUser.worker.friendlyName || req.currentUser.email
-    }`,
+    } -`,
     channel: Channel.callback,
     phone,
     name: client.name || name,
     service: '',
     contact_uri,
-    metadata: { comment },
+    metadata: `"comment": "${comment}"`,
   };
 
   const taskAttrs = {
