@@ -172,7 +172,7 @@ router.post('/create-task-call/:phone', configuration, async (req, res) => {
     title: 'Appel sortant',
     text: `Appel du numero: ${phone}`,
     channel: Channel.call,
-    name: phone,
+    name: client.name || phone,
     service: '',
     phone: phone,
     contact_uri,
