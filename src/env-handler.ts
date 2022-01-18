@@ -47,6 +47,11 @@ export const schema = {
   // Recaptcha verification Url
   CAPTCHA_URL: String,
   CAPTCHA_KEY: String,
+
+  // Mailgun setup
+  MAILGUN_API_KEY: String,
+  MAILGUN_DOMAIN: String,
+  CONTACT_EMAIL: String,
 };
 
 export let env: Env;

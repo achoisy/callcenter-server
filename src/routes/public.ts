@@ -1,5 +1,5 @@
 import { env } from '../env-handler';
-import { Types } from 'mongoose';
+// import { Types } from 'mongoose';
 import express, { Request, Response } from 'express';
 import { Twilio } from '../services/twilio-helper';
 import { body } from 'express-validator';
@@ -9,12 +9,7 @@ import { agendaWrapper } from '../services/agenda';
 import { Callback } from '../models/callback';
 import { Client } from '../models/client';
 import { CustomError } from '../errors';
-import {
-  JobNames,
-  TaskrouterAttributes,
-  Channel,
-  TaskChannel,
-} from '../interfaces';
+import { TaskrouterAttributes, Channel, TaskChannel } from '../interfaces';
 
 const router = express.Router();
 
@@ -39,7 +34,7 @@ router.post(
 
     const attributes: TaskrouterAttributes = {
       clientId: client._id,
-      title: 'Demande de rappel',
+      title: 'DEVIS',
       text: 'Demande de devis fait par internet',
       channel: Channel.callback,
       name: client.name || form.nom,
@@ -111,7 +106,7 @@ router.post(
 
     const attributes: TaskrouterAttributes = {
       clientId: client._id,
-      title: 'Demande de rappel URGENT',
+      title: 'URGENT',
       text: 'Demande de rappel urgent fait par internet',
       channel: Channel.callback,
       name: client.name || form.nom,
@@ -136,7 +131,7 @@ router.post(
       });
       await callback.save();
 
-      if (opening.isOpen) {
+      /* if (opening.isOpen) {
         agendaWrapper.nowTask(callback.id, taskAttrs);
       } else {
         // TODO: Definir la procedure hors heure d'ouverture pour les urgences
@@ -145,7 +140,9 @@ router.post(
           callback.id,
           taskAttrs
         );
-      }
+      } */
+
+      agendaWrapper.nowTask(callback.id, taskAttrs);
 
       res.status(200).send();
 

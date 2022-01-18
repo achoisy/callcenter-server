@@ -1,11 +1,7 @@
 import { Agenda, Job } from 'agenda';
-import { taskrouterWrapper } from './taskrouter-helper';
-import {
-  TaskrouterAttributes,
-  TaskChannel,
-  JobNames,
-  TaskAttrs,
-} from '../interfaces';
+// import { taskrouterWrapper } from './taskrouter-helper';
+import { MailgunHelper as mailgun } from './mailgun';
+import { TaskAttrs } from '../interfaces';
 
 class AgendaWrapper {
   private _agenda?: Agenda;
@@ -30,14 +26,30 @@ class AgendaWrapper {
 
   scheduleTask(when: Date | string, jobId: string, data: TaskAttrs) {
     this.agenda.define(jobId, async () => {
-      await taskrouterWrapper.createTask(data);
+      // Switching from phone callback to email
+      // uncomment next line to put back phone callack !
+      // --------------
+      // await taskrouterWrapper.createTask(data);
+      // --------------
+      await mailgun.sendMsg(
+        `[${data.attributes.title}] ${data.attributes.name}`,
+        data
+      );
     });
     this.agenda.schedule(when, jobId, data);
   }
 
   nowTask(jobId: string, data: TaskAttrs) {
     this.agenda.define(jobId, async () => {
-      await taskrouterWrapper.createTask(data);
+      // Switching from phone callback to email
+      // uncomment next line to put back phone callack !
+      // --------------
+      // await taskrouterWrapper.createTask(data);
+      // --------------
+      await mailgun.sendMsg(
+        `[${data.attributes.title}] ${data.attributes.name}`,
+        data
+      );
     });
     this.agenda.now(jobId, data);
   }
