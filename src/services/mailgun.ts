@@ -14,7 +14,7 @@ export class MailgunHelper {
   static async sendMsg(subject: string, messageData: TaskAttrs) {
     try {
       const data = {
-        from: `Homesecour.fr <postmaster@${
+        from: `Homesecours.fr <postmaster@${
           env.MAILGUN_DOMAIN || 'homesecours.fr'
         }>`,
         to: env.CONTACT_EMAIL || 'homesecours@gmail.com',
